@@ -29,6 +29,28 @@ Le applicazioni caricate in SAKAI vengono chiamate **SAK app**.
 
 ---
 
+## 📁 Creare una SAK App da file `.zip`
+
+Puoi importare anche app in formato `.zip`. Ecco come prepararle:
+
+### ✅ Requisiti:
+
+- Il file `.zip` **deve contenere almeno un file `.html` o `.htm`**.
+- Ogni `.html` verrà trattato come una SAK app separata.
+- Il file `.html` dovrebbe:
+  - Essere **autosufficiente** (cioè, avere tutto inline)
+  - Oppure includere **JS/CSS esterni** con percorsi **relativi** coerenti (es. `./style.css`)
+- Non usare **path assoluti** (es. `/home/utente/...` o `C:\Users\...`)
+- File `.zip` **senza file `.html`** saranno ignorati.
+
+### ❗ Limiti attuali:
+
+> Le risorse presenti nello zip **non vengono servite da un web server interno**, quindi non è garantito il corretto funzionamento di app complesse con molte dipendenze.
+
+📌 **Suggerimento**: per ora funzionano meglio app con tutto inline in un singolo `.html`.
+
+---
+
 ## ⚙️ Modalità d'uso
 
 🔗 **Web App (consigliata):**  
