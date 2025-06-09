@@ -53,6 +53,7 @@ L'icona viene gestita con questa priorità:
 
 Ecco un esempio di `head` per un file HTML che sfrutta tutte le funzionalità di SAKAI:
 
+```html
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -70,6 +71,7 @@ Ecco un esempio di `head` per un file HTML che sfrutta tutte le funzionalità di
     <h1>La Mia Fantastica App</h1>
 </body>
 </html>
+```
 
 ## 📁 Creare una SAK App da file `.zip`
 
