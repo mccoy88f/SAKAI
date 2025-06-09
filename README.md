@@ -101,7 +101,7 @@ Puoi importare anche app in formato `.zip`. Ecco come prepararle:
 [https://mccoy88f.github.io/SAKAI/](https://mccoy88f.github.io/SAKAI/)
 
 💻 **Esecuzione locale:**  
-Apri il file `SAK Launcher - FINAL V2.html` direttamente nel tuo browser. Nessuna installazione richiesta.
+Apri il file `index.html` direttamente nel tuo browser. Nessuna installazione richiesta.
 
 🖥️ **In sviluppo:**  
 Una versione **multipiattaforma (Windows, macOS, Linux)** con tecnologia **Electron** per un’esperienza desktop nativa.
