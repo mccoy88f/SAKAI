@@ -1,0 +1,1898 @@
+<!DOCTYPE html>
+<!-- saved from url=(0058)file:///Users/antonello/Downloads/sak_launcher%20(10).html -->
+<html lang="it"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAK Launcher</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            margin: 0;
+            transition: all 0.3s ease;
+        }
+
+        body.home-mode {
+            padding: 20px;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            width: 100%;
+            height: 100vh;
+            max-width: none;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+
+        .container.home-mode {
+            max-width: 1200px;
+            height: calc(100vh - 40px);
+            border-radius: 24px;
+        }
+
+        /* Home Screen */
+        .home-screen {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            overflow-y: auto;
+        }
+
+        .home-screen.no-apps {
+            justify-content: center;
+        }
+
+        .logo {
+            font-size: 4.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ffffff, #f0f0f0, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            text-align: center;
+            letter-spacing: 0.05em;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: 300;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        .header-section.has-apps {
+            margin-bottom: 20px;
+        }
+
+        .header-section.has-apps .logo {
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+        }
+
+        .header-section.has-apps .subtitle {
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+
+        .import-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 650px;
+            margin-top: auto;
+        }
+
+        .import-section.has-apps {
+            margin-top: 20px;
+        }
+
+        .import-button {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 16px 32px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 
+                0 8px 25px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .import-button:hover {
+            background: rgba(255, 255, 255, 0.35);
+            transform: translateY(-3px);
+            box-shadow: 
+                0 12px 35px rgba(0, 0, 0, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .import-button:active {
+            transform: translateY(-1px);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        /* Profile Buttons */
+        .profile-choice {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .choice-button {
+            flex: 1;
+            backdrop-filter: blur(10px);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 18px 24px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 
+                0 6px 20px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .new-profile {
+            background: rgba(34, 197, 94, 0.25);
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+
+        .new-profile:hover {
+            background: rgba(34, 197, 94, 0.35);
+            transform: translateY(-3px);
+            box-shadow: 
+                0 8px 25px rgba(34, 197, 94, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            border-color: rgba(34, 197, 94, 0.4);
+        }
+
+        .open-profile {
+            background: rgba(59, 130, 246, 0.25);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .open-profile:hover {
+            background: rgba(59, 130, 246, 0.35);
+            transform: translateY(-3px);
+            box-shadow: 
+                0 8px 25px rgba(59, 130, 246, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
+        .choice-button:active {
+            transform: translateY(-1px);
+        }
+
+        .profile-active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 650px;
+        }
+
+        .profile-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .profile-button {
+            flex: 1;
+            backdrop-filter: blur(10px);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 12px 20px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 
+                0 4px 15px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .close-profile {
+            background: rgba(239, 68, 68, 0.25);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .close-profile:hover {
+            background: rgba(239, 68, 68, 0.35);
+            transform: translateY(-2px);
+            box-shadow: 
+                0 6px 20px rgba(239, 68, 68, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            border-color: rgba(239, 68, 68, 0.4);
+        }
+
+        .export-profile {
+            background: rgba(34, 197, 94, 0.25);
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+
+        .export-profile:hover {
+            background: rgba(34, 197, 94, 0.35);
+            transform: translateY(-2px);
+            box-shadow: 
+                0 6px 20px rgba(34, 197, 94, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            border-color: rgba(34, 197, 94, 0.4);
+        }
+
+        .profile-button:active {
+            transform: translateY(0px);
+        }
+
+        .import-buttons {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+            max-width: 650px;
+            margin-bottom: 10px;
+        }
+
+        .webapp-button {
+            background: rgba(168, 85, 247, 0.25);
+            backdrop-filter: blur(10px);
+            color: white;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            padding: 16px 32px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 
+                0 8px 25px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            flex: 1;
+        }
+
+        .webapp-button:hover {
+            background: rgba(168, 85, 247, 0.35);
+            transform: translateY(-3px);
+            box-shadow: 
+                0 12px 35px rgba(168, 85, 247, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            border-color: rgba(168, 85, 247, 0.4);
+        }
+
+        .webapp-button:active {
+            transform: translateY(-1px);
+        }
+
+        .import-button {
+            flex: 1;
+        }
+
+        /* App Viewer */
+        .app-viewer {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .app-header {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(15px);
+            color: white;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            min-height: 60px;
+            z-index: 1000;
+            position: relative;
+        }
+
+        .app-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            letter-spacing: 0.02em;
+        }
+
+        .close-button {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: 300;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .close-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .app-content {
+            flex: 1;
+            background: white;
+            position: relative;
+            overflow: hidden;
+            border-radius: 0;
+        }
+
+        .app-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+            display: block;
+        }
+
+        /* Drag and Drop */
+        .drop-zone {
+            border: 2px dashed rgba(255, 255, 255, 0.4);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 25px 0;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .drop-zone.dragover {
+            border-color: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.02);
+            box-shadow: 
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .drop-text {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 15px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Loading */
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Recent Apps */
+        .recent-apps {
+            width: 100%;
+            max-width: 650px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .recent-apps.has-apps {
+            margin-bottom: 20px;
+        }
+
+        .recent-title {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: left;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .app-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .app-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .app-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+        }
+
+        .app-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+        }
+
+        .app-list::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .app-item {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .app-item:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .app-item-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+        }
+
+        .app-icon {
+            width: 48px;
+            height: 48px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .app-icon img {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+
+        .app-icon .emoji {
+            font-size: 28px;
+            line-height: 1;
+        }
+
+        .app-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-app, .delete-app {
+            backdrop-filter: blur(10px);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 300;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .info-app {
+            background: rgba(59, 130, 246, 0.8);
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        }
+
+        .info-app:hover {
+            background: rgba(59, 130, 246, 0.9);
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .delete-app {
+            background: rgba(255, 71, 87, 0.8);
+            box-shadow: 0 2px 8px rgba(255, 71, 87, 0.3);
+        }
+
+        .delete-app:hover {
+            background: rgba(255, 55, 66, 0.9);
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(255, 71, 87, 0.4);
+        }
+
+        .app-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .app-name {
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 1.1rem;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .app-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .app-author {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+        }
+
+        .app-date {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 400;
+        }
+
+        /* Info Popup */
+        .info-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .info-popup.show {
+            display: flex;
+        }
+
+        .info-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .info-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .info-icon {
+            width: 64px;
+            height: 64px;
+            background: white;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .info-icon:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .info-icon img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            border-radius: 6px;
+        }
+
+        .info-icon .emoji {
+            font-size: 36px;
+            line-height: 1;
+        }
+
+        .info-title {
+            flex: 1;
+        }
+
+        .info-app-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .info-app-type {
+            font-size: 0.9rem;
+            color: #666;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .info-details {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .info-field {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .info-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            font-size: 1rem;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .info-description {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 12px;
+            border-radius: 8px;
+            font-style: italic;
+        }
+
+        .info-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .info-button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .info-button.primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .info-button.secondary {
+            background: rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
+
+        .info-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .icon-picker-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .icon-picker-option {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .icon-picker-option:hover {
+            background: #f0f0f0;
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Credits */
+        .credits {
+            position: fixed;
+            bottom: 10px;
+            right: 15px;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .credits a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            pointer-events: auto;
+            transition: color 0.3s ease;
+        }
+
+        .credits a:hover {
+            color: rgba(255, 255, 255, 1);
+        }
+
+        /* Web App Dialog */
+        .webapp-dialog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .webapp-dialog.show {
+            display: flex;
+        }
+
+        .webapp-dialog-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .webapp-dialog-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .webapp-dialog-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .webapp-dialog-subtitle {
+            font-size: 1rem;
+            color: #666;
+        }
+
+        .webapp-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .webapp-field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .webapp-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .webapp-input {
+            padding: 12px 16px;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            font-size: 1rem;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .webapp-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .webapp-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .webapp-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .webapp-btn.primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .webapp-btn.secondary {
+            background: rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
+
+        .webapp-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .webapp-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+    </style>
+</head>
+<body class="home-mode">
+    <div class="container home-mode">
+        <!-- Home Screen -->
+        <div class="home-screen" id="homeScreen">
+            <div class="header-section has-apps" id="headerSection">
+                <div class="logo">SAKAI</div>
+                <div class="subtitle">Il tuo Swiss Army Knife digitale per app web</div>
+            </div>
+            
+            <div class="recent-apps has-apps" id="recentApps" style="display: flex;">
+                <div class="recent-title">Le tue app</div>
+                <div class="app-list" id="appList"></div>
+            </div>
+
+            <div class="import-section has-apps" id="importSection">
+                <!-- Stato iniziale: scelta profilo -->
+                <div class="profile-choice" id="profileChoice" style="display: none;">
+                    <button class="choice-button new-profile" onclick="launcher.createNewProfile()">
+                        ➕ Crea nuovo profilo
+                    </button>
+                    
+                    <button class="choice-button open-profile" onclick="document.getElementById(&#39;profileInput&#39;).click()">
+                        📂 Apri profilo
+                    </button>
+                    
+                    <input type="file" id="profileInput" class="file-input" accept=".sakaiprofile">
+                </div>
+
+                <!-- Stato con profilo aperto -->
+                <div class="profile-active" id="profileActive" style="display: flex;">
+                    <div class="import-buttons">
+                        <button class="import-button" onclick="document.getElementById(&#39;fileInput&#39;).click()">
+                            🔧 Importa una app SAKAI
+                        </button>
+                        
+                        <button class="webapp-button" onclick="launcher.showWebAppDialog()">
+                            🌐 Aggiungi web app
+                        </button>
+                    </div>
+                    
+                    <input type="file" id="fileInput" class="file-input" multiple="" accept=".html,.htm,.zip">
+                    
+                    <div class="drop-zone" id="dropZone">
+                        <div class="drop-text">Oppure trascina qui i tuoi file HTML/ZIP</div>
+                        <small style="color: rgba(255, 255, 255, 0.6); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);">Supporta file HTML e archivi ZIP</small>
+                    </div>
+
+                    <div class="profile-buttons">
+                        <button class="profile-button close-profile" onclick="launcher.closeProfile()">
+                            🔒 Chiudi profilo
+                        </button>
+                        
+                        <button class="profile-button export-profile" onclick="launcher.exportProfile()">
+                            📦 Esporta profilo
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- App Viewer -->
+        <div class="app-viewer" id="appViewer">
+            <div class="app-header">
+                <div class="app-title" id="appTitle">SAKAI</div>
+                <button class="close-button" id="closeButton">×</button>
+            </div>
+            <div class="app-content">
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <div>Caricamento app...</div>
+                </div>
+                <iframe class="app-frame" id="appFrame" sandbox="allow-scripts allow-same-origin allow-forms" src="./SAK Launcher_files/saved_resource.html"></iframe>
+            </div>
+        </div>
+
+        <!-- Info Popup -->
+        <div class="info-popup" id="infoPopup">
+            <div class="info-content">
+                <div class="info-header">
+                    <div class="info-icon" id="infoIcon" onclick="launcher.toggleIconPicker()">
+                        <!-- Icona dell'app -->
+                    </div>
+                    <div class="info-title">
+                        <div class="info-app-name" id="infoAppName">Nome App</div>
+                        <div class="info-app-type" id="infoAppType">HTML</div>
+                    </div>
+                </div>
+                
+                <div class="info-details">
+                    <div class="info-field" id="infoAuthorField">
+                        <div class="info-label">Autore</div>
+                        <div class="info-value" id="infoAuthor">Sconosciuto</div>
+                    </div>
+                    
+                    <div class="info-field" id="infoDescriptionField">
+                        <div class="info-label">Descrizione</div>
+                        <div class="info-value info-description" id="infoDescription">Nessuna descrizione disponibile</div>
+                    </div>
+                    
+                    <div class="info-field">
+                        <div class="info-label">Data aggiunta</div>
+                        <div class="info-value" id="infoDate">--</div>
+                    </div>
+                    
+                    <div class="info-field" id="iconPickerField" style="display: none;">
+                        <div class="info-label">Scegli icona</div>
+                        <div class="icon-picker-grid" id="iconPickerGrid">
+                            <!-- Emoji options -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-actions">
+                    <button class="info-button secondary" onclick="launcher.closeInfoPopup()">Chiudi</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Credits -->
+        <div class="credits">
+            Realizzato da <a href="https://github.com/McCoy88f" target="_blank" rel="noopener noreferrer">McCoy88f</a> on Github
+        </div>
+
+        <!-- Web App Dialog -->
+        <div class="webapp-dialog" id="webappDialog">
+            <div class="webapp-dialog-content">
+                <div class="webapp-dialog-header">
+                    <div class="webapp-dialog-title">🌐 Aggiungi Web App</div>
+                    <div class="webapp-dialog-subtitle">Inserisci nome e URL della web app</div>
+                </div>
+                
+                <div class="webapp-form">
+                    <div class="webapp-field">
+                        <label class="webapp-label">Nome App</label>
+                        <input type="text" id="webappName" class="webapp-input" placeholder="es. Gmail, YouTube, ChatGPT...">
+                    </div>
+                    
+                    <div class="webapp-field">
+                        <label class="webapp-label">URL</label>
+                        <input type="url" id="webappUrl" class="webapp-input" placeholder="https://example.com">
+                    </div>
+                </div>
+                
+                <div class="webapp-actions">
+                    <button class="webapp-btn secondary" onclick="launcher.closeWebAppDialog()">Annulla</button>
+                    <button class="webapp-btn primary" onclick="launcher.addWebApp()" id="addWebAppBtn">Aggiungi</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./SAK Launcher_files/jszip.min.js"></script>
+    <script>
+        class SAKLauncher {
+            constructor() {
+                this.apps = JSON.parse(localStorage.getItem('sakApps') || '[]');
+                this.defaultEmojis = ['⚡', '🚀', '🎯', '💡', '🔧', '🎨', '📊', '🌟', '🔮', '🎪', '🎭', '🎪', '🎨', '🎯', '🚀', '⚡', '💫', '🌈', '🎲', '🎸', '🎹', '🎵', '🎬', '📱', '💻', '🖥️', '⌚', '📷', '🎮', '🕹️'];
+                this.currentInfoApp = null;
+                this.profileActive = localStorage.getItem('sakaiProfileActive') === 'true' || this.apps.length > 0;
+                this.initializeEventListeners();
+                this.renderAppList();
+            }
+
+            initializeEventListeners() {
+                // File input
+                document.getElementById('fileInput').addEventListener('change', (e) => {
+                    this.handleFiles(e.target.files);
+                });
+
+                // Profile input
+                document.getElementById('profileInput').addEventListener('change', (e) => {
+                    if (e.target.files.length > 0) {
+                        this.importProfile(e.target.files[0]);
+                    }
+                });
+
+                // Drag and drop
+                const dropZone = document.getElementById('dropZone');
+                dropZone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.add('dragover');
+                });
+
+                dropZone.addEventListener('dragleave', () => {
+                    dropZone.classList.remove('dragover');
+                });
+
+                dropZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.remove('dragover');
+                    this.handleFiles(e.dataTransfer.files);
+                });
+
+                // Close button
+                document.getElementById('closeButton').addEventListener('click', () => {
+                    this.goHome();
+                });
+
+                // Close popup on outside click
+                document.getElementById('infoPopup').addEventListener('click', (e) => {
+                    if (e.target.id === 'infoPopup') {
+                        this.closeInfoPopup();
+                    }
+                });
+
+                // Close webapp dialog on outside click
+                document.getElementById('webappDialog').addEventListener('click', (e) => {
+                    if (e.target.id === 'webappDialog') {
+                        this.closeWebAppDialog();
+                    }
+                });
+            }
+
+            async handleFiles(files) {
+                // Attiva il profilo se non è già attivo
+                if (!this.profileActive) {
+                    this.profileActive = true;
+                }
+                
+                for (const file of files) {
+                    if (file.type === 'text/html' || file.name.endsWith('.html') || file.name.endsWith('.htm')) {
+                        await this.importHTMLFile(file);
+                    } else if (file.type === 'application/zip' || file.name.endsWith('.zip')) {
+                        await this.importZipFile(file);
+                    }
+                }
+                this.renderAppList();
+            }
+
+            async importHTMLFile(file) {
+                const content = await this.readFileAsText(file);
+                const appName = file.name.replace(/\.[^/.]+$/, "");
+                
+                // Estrai favicon dal contenuto HTML
+                const favicon = this.extractFavicon(content);
+                const author = this.extractAuthor(content);
+                const description = this.extractDescription(content);
+                const randomEmoji = this.getRandomEmoji();
+                
+                const app = {
+                    id: Date.now().toString(),
+                    name: appName,
+                    content: content,
+                    type: 'html',
+                    dateAdded: new Date().toLocaleString('it-IT'),
+                    favicon: favicon,
+                    author: author,
+                    description: description,
+                    emoji: randomEmoji,
+                    useCustomIcon: false
+                };
+
+                this.apps.unshift(app);
+                this.saveApps();
+            }
+
+            async importZipFile(file) {
+                try {
+                    // Importa il file ZIP usando JSZip se disponibile
+                    if (typeof JSZip !== 'undefined') {
+                        const zip = new JSZip();
+                        const contents = await zip.loadAsync(file);
+                        
+                        // Cerca file HTML nel ZIP
+                        const htmlFiles = Object.keys(contents.files).filter(filename => 
+                            filename.endsWith('.html') || filename.endsWith('.htm')
+                        );
+                        
+                        if (htmlFiles.length > 0) {
+                            // Importa tutti i file HTML trovati
+                            for (const filename of htmlFiles) {
+                                const content = await contents.files[filename].async('text');
+                                const appName = filename.replace(/\.[^/.]+$/, "").replace(/^.*\//, ""); // Rimuovi path
+                                
+                                const favicon = this.extractFavicon(content);
+                                const author = this.extractAuthor(content);
+                                const description = this.extractDescription(content);
+                                const randomEmoji = this.getRandomEmoji();
+                                
+                                const app = {
+                                    id: Date.now().toString() + '_' + Math.random().toString(36).substr(2, 9),
+                                    name: appName,
+                                    content: content,
+                                    type: 'html',
+                                    dateAdded: new Date().toLocaleString('it-IT'),
+                                    favicon: favicon,
+                                    author: author,
+                                    description: description,
+                                    emoji: randomEmoji,
+                                    useCustomIcon: false
+                                };
+
+                                this.apps.unshift(app);
+                            }
+                        } else {
+                            // Nessun file HTML trovato
+                            throw new Error('Nessun file HTML trovato nel ZIP');
+                        }
+                    } else {
+                        // JSZip non disponibile, fallback
+                        throw new Error('JSZip non disponibile');
+                    }
+                } catch (error) {
+                    console.warn('Errore nell\'importazione ZIP:', error);
+                    // Fallback per ZIP - crea app placeholder
+                    const appName = file.name.replace(/\.[^/.]+$/, "");
+                    const randomEmoji = this.getRandomEmoji();
+                    
+                    const app = {
+                        id: Date.now().toString(),
+                        name: appName,
+                        content: `<html><body><h1>App ZIP: ${appName}</h1><p>Funzionalità ZIP limitata - importa manualmente i file HTML</p></body></html>`,
+                        type: 'zip',
+                        dateAdded: new Date().toLocaleString('it-IT'),
+                        favicon: null,
+                        author: null,
+                        description: 'Archivio ZIP',
+                        emoji: randomEmoji,
+                        useCustomIcon: false
+                    };
+
+                    this.apps.unshift(app);
+                }
+                
+                this.saveApps();
+            }
+
+            extractFavicon(htmlContent) {
+                // Cerca favicon nel contenuto HTML
+                const faviconRegex = /<link[^>]*rel=["'](?:shortcut )?icon["'][^>]*href=["']([^"']+)["'][^>]*>/i;
+                const match = htmlContent.match(faviconRegex);
+                
+                if (match && match[1]) {
+                    let faviconUrl = match[1];
+                    
+                    // Se è un percorso relativo, convertilo in data URL se possibile
+                    // oppure restituisci l'URL così com'è
+                    if (!faviconUrl.startsWith('http') && !faviconUrl.startsWith('data:')) {
+                        // Per i percorsi relativi, proviamo con alcuni fallback comuni
+                        return null; // Per ora ritorniamo null per i percorsi relativi
+                    }
+                    
+                    return faviconUrl;
+                }
+                
+                return null;
+            }
+
+            extractAuthor(htmlContent) {
+                // Cerca l'autore nei meta tag
+                const authorPatterns = [
+                    /<meta[^>]*name=["']author["'][^>]*content=["']([^"']+)["'][^>]*>/i,
+                    /<meta[^>]*content=["']([^"']+)["'][^>]*name=["']author["'][^>]*>/i,
+                    /<meta[^>]*name=["']creator["'][^>]*content=["']([^"']+)["'][^>]*>/i,
+                    /<meta[^>]*content=["']([^"']+)["'][^>]*name=["']creator["'][^>]*>/i
+                ];
+                
+                for (const pattern of authorPatterns) {
+                    const match = htmlContent.match(pattern);
+                    if (match && match[1] && match[1].trim()) {
+                        return match[1].trim();
+                    }
+                }
+                
+                return null;
+            }
+
+            extractDescription(htmlContent) {
+                // Cerca la descrizione nei meta tag
+                const descriptionPatterns = [
+                    /<meta[^>]*name=["']description["'][^>]*content=["']([^"']+)["'][^>]*>/i,
+                    /<meta[^>]*content=["']([^"']+)["'][^>]*name=["']description["'][^>]*>/i,
+                    /<meta[^>]*property=["']og:description["'][^>]*content=["']([^"']+)["'][^>]*>/i,
+                    /<meta[^>]*content=["']([^"']+)["'][^>]*property=["']og:description["'][^>]*>/i
+                ];
+                
+                for (const pattern of descriptionPatterns) {
+                    const match = htmlContent.match(pattern);
+                    if (match && match[1] && match[1].trim()) {
+                        return match[1].trim();
+                    }
+                }
+                
+                return null;
+            }
+
+            getRandomEmoji() {
+                return this.defaultEmojis[Math.floor(Math.random() * this.defaultEmojis.length)];
+            }
+
+            readFileAsText(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = e => resolve(e.target.result);
+                    reader.onerror = reject;
+                    reader.readAsText(file);
+                });
+            }
+
+            createNewProfile() {
+                this.profileActive = true;
+                this.renderAppList();
+            }
+
+            closeProfile() {
+                const confirmClose = confirm(
+                    'Sei sicuro di voler chiudere questo profilo?\n\n' +
+                    'Tutte le app verranno rimosse e tornerai alla schermata iniziale.\n\n' +
+                    'SUGGERIMENTO: Esporta il profilo prima di chiuderlo per salvare le tue app.'
+                );
+                
+                if (confirmClose) {
+                    this.apps = [];
+                    this.profileActive = false;
+                    this.saveApps();
+                    this.renderAppList();
+                }
+            }
+
+            renderAppList() {
+                const appList = document.getElementById('appList');
+                const homeScreen = document.getElementById('homeScreen');
+                const headerSection = document.getElementById('headerSection');
+                const importSection = document.getElementById('importSection');
+                const recentApps = document.getElementById('recentApps');
+                const profileChoice = document.getElementById('profileChoice');
+                const profileActive = document.getElementById('profileActive');
+                
+                appList.innerHTML = '';
+
+                if (this.apps.length === 0 && !this.profileActive) {
+                    // Modalità "scelta profilo" - centrato
+                    homeScreen.classList.add('no-apps');
+                    headerSection.classList.remove('has-apps');
+                    importSection.classList.remove('has-apps');
+                    recentApps.classList.remove('has-apps');
+                    recentApps.style.display = 'none';
+                    profileChoice.style.display = 'flex';
+                    profileActive.style.display = 'none';
+                } else {
+                    // Modalità "profilo attivo" - app in alto, controlli in basso
+                    homeScreen.classList.remove('no-apps');
+                    headerSection.classList.add('has-apps');
+                    importSection.classList.add('has-apps');
+                    recentApps.classList.add('has-apps');
+                    recentApps.style.display = 'flex';
+                    profileChoice.style.display = 'none';
+                    profileActive.style.display = 'flex';
+
+                    this.apps.forEach(app => {
+                        const appItem = document.createElement('div');
+                        appItem.className = 'app-item';
+                        
+                        const iconContent = this.getIconContent(app);
+                        const authorInfo = app.author ? `<div class="app-author">di ${app.author}</div>` : '';
+                        
+                        appItem.innerHTML = `
+                            <div class="app-item-content">
+                                <div class="app-icon">
+                                    ${iconContent}
+                                </div>
+                                <div class="app-info">
+                                    <div class="app-name">${app.name}</div>
+                                    <div class="app-meta">
+                                        ${authorInfo}
+                                        <div class="app-date">Aggiunta il ${app.dateAdded}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="app-actions">
+                                <button class="info-app" onclick="launcher.showAppInfo('${app.id}')" title="Informazioni app">i</button>
+                                <button class="delete-app" onclick="launcher.deleteApp('${app.id}')" title="Elimina app">×</button>
+                            </div>
+                        `;
+                        
+                        // Aggiungi event listener per il click sull'item (escluse le azioni)
+                        appItem.addEventListener('click', (e) => {
+                            if (!e.target.closest('.app-actions')) {
+                                this.loadApp(app);
+                            }
+                        });
+
+                        appList.appendChild(appItem);
+                    });
+                }
+            }
+
+            getIconContent(app) {
+                if (app.useCustomIcon || !app.favicon) {
+                    return `<span class="emoji">${app.emoji}</span>`;
+                } else {
+                    return `<img src="${app.favicon}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" style="display: block;">
+                            <span class="emoji" style="display: none;">${app.emoji}</span>`;
+                }
+            }
+
+            showAppInfo(appId) {
+                const app = this.apps.find(a => a.id === appId);
+                if (!app) return;
+                
+                this.currentInfoApp = app;
+                
+                // Popola il popup
+                document.getElementById('infoAppName').textContent = app.name;
+                document.getElementById('infoAppType').textContent = app.type.toUpperCase();
+                document.getElementById('infoDate').textContent = app.dateAdded;
+                
+                // Icona
+                const infoIcon = document.getElementById('infoIcon');
+                infoIcon.innerHTML = this.getIconContent(app);
+                
+                // Autore
+                const authorField = document.getElementById('infoAuthorField');
+                const authorValue = document.getElementById('infoAuthor');
+                if (app.author) {
+                    authorField.style.display = 'flex';
+                    authorValue.textContent = app.author;
+                } else {
+                    authorField.style.display = 'none';
+                }
+                
+                // Descrizione
+                const descriptionField = document.getElementById('infoDescriptionField');
+                const descriptionValue = document.getElementById('infoDescription');
+                if (app.description) {
+                    descriptionField.style.display = 'flex';
+                    descriptionValue.textContent = app.description;
+                } else {
+                    descriptionField.style.display = 'none';
+                }
+                
+                // Prepara il picker di icone
+                const iconPickerGrid = document.getElementById('iconPickerGrid');
+                iconPickerGrid.innerHTML = this.defaultEmojis.map(emoji => 
+                    `<div class="icon-picker-option" onclick="launcher.changeAppIconFromInfo('${emoji}')">${emoji}</div>`
+                ).join('');
+                
+                // Mostra popup
+                document.getElementById('infoPopup').classList.add('show');
+            }
+
+            closeInfoPopup() {
+                document.getElementById('infoPopup').classList.remove('show');
+                document.getElementById('iconPickerField').style.display = 'none';
+                this.currentInfoApp = null;
+            }
+
+            toggleIconPicker() {
+                const iconPickerField = document.getElementById('iconPickerField');
+                if (iconPickerField.style.display === 'none') {
+                    iconPickerField.style.display = 'flex';
+                } else {
+                    iconPickerField.style.display = 'none';
+                }
+            }
+
+            changeAppIconFromInfo(emoji) {
+                if (!this.currentInfoApp) return;
+                
+                this.currentInfoApp.emoji = emoji;
+                this.currentInfoApp.useCustomIcon = true;
+                this.saveApps();
+                
+                // Aggiorna l'icona nel popup
+                const infoIcon = document.getElementById('infoIcon');
+                infoIcon.innerHTML = this.getIconContent(this.currentInfoApp);
+                
+                // Aggiorna la lista
+                this.renderAppList();
+                
+                // Nascondi il picker
+                document.getElementById('iconPickerField').style.display = 'none';
+            }
+
+            launchAppFromInfo() {
+                if (this.currentInfoApp) {
+                    this.closeInfoPopup();
+                    this.loadApp(this.currentInfoApp);
+                }
+            }
+
+            async exportProfile() {
+                if (this.apps.length === 0) {
+                    alert('Nessuna app da esportare nel profilo!');
+                    return;
+                }
+
+                try {
+                    // Usa JSZip se disponibile, altrimenti fallback
+                    if (typeof JSZip !== 'undefined') {
+                        await this.exportProfileAsZip();
+                    } else {
+                        await this.exportAppsAsSeparateFiles();
+                    }
+                } catch (error) {
+                    console.error('Errore durante l\'esportazione del profilo:', error);
+                    alert('Errore durante l\'esportazione del profilo');
+                }
+            }
+
+            async exportProfileAsZip() {
+                const zip = new JSZip();
+                const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+                
+                // Aggiungi ogni app come file HTML
+                this.apps.forEach((app, index) => {
+                    if (app.type === 'html') {
+                        const filename = `${app.name.replace(/[^a-zA-Z0-9-_]/g, '_')}.html`;
+                        zip.file(filename, app.content);
+                    }
+                });
+                
+                // Aggiungi file di metadati con info sulle app
+                const profileData = {
+                    exportDate: new Date().toISOString(),
+                    sakaiVersion: '1.0',
+                    profileType: 'sakai_profile',
+                    totalApps: this.apps.length,
+                    apps: this.apps.map(app => ({
+                        name: app.name,
+                        type: app.type,
+                        author: app.author,
+                        description: app.description,
+                        dateAdded: app.dateAdded,
+                        emoji: app.emoji,
+                        useCustomIcon: app.useCustomIcon
+                    }))
+                };
+                
+                zip.file('sakai_profile.json', JSON.stringify(profileData, null, 2));
+                
+                // Genera e scarica il ZIP
+                const content = await zip.generateAsync({ type: 'blob' });
+                const url = URL.createObjectURL(content);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `sakai_profile_${timestamp}.sakaiprofile`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                alert(`Profilo con ${this.apps.length} app esportato con successo!`);
+            }
+
+            async exportAppsAsSeparateFiles() {
+                // Fallback: esporta le app una per una
+                this.apps.forEach((app, index) => {
+                    if (app.type === 'html') {
+                        const blob = new Blob([app.content], { type: 'text/html' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `${app.name.replace(/[^a-zA-Z0-9-_]/g, '_')}.html`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        
+                        // Aggiungi un piccolo delay tra i download
+                        setTimeout(() => {}, 100 * index);
+                    }
+                });
+                
+                alert(`${this.apps.length} app esportate come file separati!`);
+            }
+
+            async importProfile(file) {
+                if (!file.name.endsWith('.sakaiprofile')) {
+                    alert('Seleziona un file .sakaiprofile valido');
+                    return;
+                }
+
+                try {
+                    if (typeof JSZip !== 'undefined') {
+                        const zip = new JSZip();
+                        const contents = await zip.loadAsync(file);
+                        
+                        // Cerca il file di metadati del profilo
+                        if (contents.files['sakai_profile.json']) {
+                            const profileDataText = await contents.files['sakai_profile.json'].async('text');
+                            const profileData = JSON.parse(profileDataText);
+                            
+                            if (profileData.profileType === 'sakai_profile') {
+                                // Mostra anteprima profilo
+                                const confirmImport = confirm(
+                                    `Profilo SAKAI trovato:\n\n` +
+                                    `• ${profileData.totalApps} app\n` +
+                                    `• Esportato il: ${new Date(profileData.exportDate).toLocaleString('it-IT')}\n\n` +
+                                    `Vuoi aprire questo profilo?`
+                                );
+                                
+                                if (confirmImport) {
+                                    // Pulisci app attuali e attiva profilo
+                                    this.apps = [];
+                                    this.profileActive = true;
+                                    
+                                    // Importa tutte le app HTML dal profilo
+                                    const htmlFiles = Object.keys(contents.files).filter(filename => 
+                                        filename.endsWith('.html') || filename.endsWith('.htm')
+                                    );
+                                    
+                                    for (const filename of htmlFiles) {
+                                        const content = await contents.files[filename].async('text');
+                                        const appName = filename.replace(/\.[^/.]+$/, "");
+                                        
+                                        // Cerca metadati dell'app nel profilo
+                                        const appMeta = profileData.apps.find(a => 
+                                            a.name.replace(/[^a-zA-Z0-9-_]/g, '_') === appName
+                                        );
+                                        
+                                        const app = {
+                                            id: Date.now().toString() + '_' + Math.random().toString(36).substr(2, 9),
+                                            name: appMeta ? appMeta.name : appName,
+                                            content: content,
+                                            type: 'html',
+                                            dateAdded: appMeta ? appMeta.dateAdded : new Date().toLocaleString('it-IT'),
+                                            favicon: this.extractFavicon(content),
+                                            author: appMeta ? appMeta.author : this.extractAuthor(content),
+                                            description: appMeta ? appMeta.description : this.extractDescription(content),
+                                            emoji: appMeta ? appMeta.emoji : this.getRandomEmoji(),
+                                            useCustomIcon: appMeta ? appMeta.useCustomIcon : false
+                                        };
+
+                                        this.apps.push(app);
+                                    }
+                                    
+                                    this.saveApps();
+                                    this.renderAppList();
+                                    
+                                    alert(`Profilo caricato con successo!\n${this.apps.length} app disponibili.`);
+                                }
+                            } else {
+                                alert('File non è un profilo SAKAI valido');
+                            }
+                        } else {
+                            alert('File .sakaiprofile non valido: metadati mancanti');
+                        }
+                    } else {
+                        alert('JSZip non disponibile. Non è possibile aprire profili.');
+                    }
+                } catch (error) {
+                    console.error('Errore apertura profilo:', error);
+                    alert('Errore durante l\'apertura del profilo. Assicurati che sia un file .sakaiprofile valido.');
+                }
+                
+                // Reset input
+                document.getElementById('profileInput').value = '';
+            }
+
+            loadApp(app) {
+                const loading = document.getElementById('loading');
+                const appFrame = document.getElementById('appFrame');
+                const appTitle = document.getElementById('appTitle');
+                const homeScreen = document.getElementById('homeScreen');
+                const appViewer = document.getElementById('appViewer');
+                const container = document.querySelector('.container');
+                const body = document.body;
+
+                // Passa a modalità fullscreen
+                body.classList.remove('home-mode');
+                container.classList.remove('home-mode');
+
+                // Mostra loading
+                loading.style.display = 'flex';
+                appFrame.style.display = 'none';
+
+                // Aggiorna titolo
+                appTitle.textContent = app.name.toUpperCase();
+
+                // Cambia vista
+                homeScreen.style.display = 'none';
+                appViewer.style.display = 'flex';
+
+                // Carica contenuto con sandbox più permissivo per download
+                setTimeout(() => {
+                    const blob = new Blob([app.content], { type: 'text/html' });
+                    const url = URL.createObjectURL(blob);
+                    
+                    // Sandbox più permissivo per funzionalità complete
+                    appFrame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-downloads allow-modals allow-popups allow-presentation allow-top-navigation-by-user-activation');
+                    appFrame.src = url;
+                    
+                    appFrame.onload = () => {
+                        loading.style.display = 'none';
+                        appFrame.style.display = 'block';
+                        // Pulisci URL dopo caricamento
+                        setTimeout(() => URL.revokeObjectURL(url), 1000);
+                    };
+                }, 500);
+            }
+
+            deleteApp(id) {
+                if (confirm('Sei sicuro di voler eliminare questa app?')) {
+                    this.apps = this.apps.filter(app => app.id !== id);
+                    this.saveApps();
+                    this.renderAppList();
+                }
+            }
+
+            goHome() {
+                const homeScreen = document.getElementById('homeScreen');
+                const appViewer = document.getElementById('appViewer');
+                const appFrame = document.getElementById('appFrame');
+                const container = document.querySelector('.container');
+                const body = document.body;
+                
+                // Torna a modalità home
+                body.classList.add('home-mode');
+                container.classList.add('home-mode');
+                
+                homeScreen.style.display = 'flex';
+                appViewer.style.display = 'none';
+                appFrame.src = '';
+                
+                // Reset sandbox
+                appFrame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms');
+            }
+
+            
+            showWebAppDialog() {
+                document.getElementById('webappDialog').classList.add('show');
+            }
+
+            closeWebAppDialog() {
+                document.getElementById('webappDialog').classList.remove('show');
+            }
+
+            
+
+
+            
+            async 
+
+
+            
+            async addWebApp() {
+                let name = document.getElementById('webappName').value.trim();
+                const url = document.getElementById('webappUrl').value.trim();
+
+                if (!url) {
+                    alert('Inserisci l\'URL della web app.');
+                    return;
+                }
+
+                let favicon = null;
+                let description = null;
+                let pageTitle = '';
+
+                try {
+                    const response = await fetch(url);
+                    const htmlText = await response.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(htmlText, 'text/html');
+
+                    // Titolo pagina
+                    pageTitle = doc.querySelector('title')?.textContent?.trim() || '';
+
+                    // Favicon
+                    const iconLink = doc.querySelector('link[rel~="icon"]');
+                    if (iconLink) {
+                        let href = iconLink.getAttribute('href');
+                        if (href) {
+                            if (href.startsWith('http') || href.startsWith('data:')) {
+                                favicon = href;
+                            } else {
+                                const baseUrl = new URL(url);
+                                favicon = new URL(href, baseUrl).href;
+                            }
+                        }
+                    }
+
+                    // Description
+                    const descMeta = doc.querySelector('meta[name="description"], meta[property="og:description"]');
+                    if (descMeta) {
+                        description = descMeta.getAttribute('content');
+                    }
+                } catch (e) {
+                    console.warn('Impossibile recuperare favicon o metadati:', e);
+                }
+
+                if (!name && pageTitle) {
+                    name = pageTitle;
+                }
+
+                if (!name) {
+                    alert('Impossibile determinare un nome valido per l\'app.');
+                    return;
+                }
+
+                const app = {
+                    id: Date.now().toString(),
+                    name,
+                    content: `<html><body style='margin:0;padding:0;'><iframe src="${url}" style="width:100%;height:100vh;border:none;"></iframe></body></html>`,
+                    type: 'webapp',
+                    dateAdded: new Date().toLocaleString('it-IT'),
+                    favicon: favicon,
+                    author: url,
+                    description: description || 'Web App',
+                    emoji: this.getRandomEmoji(),
+                    useCustomIcon: false
+                };
+
+                this.apps.unshift(app);
+                this.saveApps();
+                this.renderAppList();
+                this.closeWebAppDialog();
+            }
+
+
+            saveApps() {
+                localStorage.setItem('sakApps', JSON.stringify(this.apps));
+                localStorage.setItem('sakaiProfileActive', this.profileActive.toString());
+            }
+        }
+
+        // Inizializza l'applicazione
+        const launcher = new SAKLauncher();
+        
+        // Imposta modalità home all'avvio
+        document.body.classList.add('home-mode');
+        document.querySelector('.container').classList.add('home-mode');
+    </script>
+
+
+        </body></html>
