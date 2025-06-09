@@ -1,49 +1,61 @@
-# SAKAI - Swiss Army Knife per Web App
+# SAKAI - Swiss Army Knife for Artificial Intelligence
 
 [👉 Vai alla Web App](https://mccoy88f.github.io/SAKAI/)
 
-SAKAI è un launcher dinamico e personalizzabile per app web e HTML standalone, progettato come un coltellino svizzero digitale per chi gestisce tante webapp in locale o online.
+SAKAI è un'applicazione web pensata per **organizzare e lanciare piccoli progetti creati da intelligenze artificiali**, che spesso vengono generati e poi dimenticati o dispersi tra i file locali. Con SAKAI puoi dare loro uno spazio ordinato e permanente, accessibile in pochi click.
+
+Il nome **SAKAI** è l'acronimo di **Swiss Army Knife (for) Artificial Intelligence**: un coltellino svizzero digitale progettato per aiutarti a gestire micro-progetti, esperimenti e utility create da AI, ma anche adatte all'uso umano.
 
 ---
 
-## ✨ Caratteristiche principali
+## ✨ Funzionalità principali
 
-- **Importa app** `.html` o `.zip` direttamente dal tuo dispositivo
-- **Aggiungi web app** tramite semplice URL
-- **Organizza le tue app** con icone personalizzate, emoji e descrizioni
-- **Salva ed esporta profili** nel formato `.sakaiprofile`
-- **Visualizza dettagli app**: autore, descrizione, data di aggiunta
-- **Esperienza elegante** con design glassmorphism, animazioni fluide e responsive
+- **Importa app**: trascina file `.html` o `.zip` contenenti mini-progetti nel launcher
+- **Aggiungi web app**: inserisci nome e URL di servizi online da integrare
+- **Organizza le tue app**: emoji personalizzate, dettagli, descrizione e autore
+- **Esporta e importa profili**: salva tutto in un file `.sakaiprofile` da riaprire in futuro
+- **Supporto drag & drop**, UI animata e responsive, senza installazione
+
+---
+
+## 📦 Cosa sono le SAK App?
+
+Le applicazioni caricate in SAKAI vengono chiamate **SAK app**.
+
+- Ogni SAK app è un piccolo progetto **standalone** in HTML/JS, pensato per essere lanciato direttamente nel browser.
+- Le app possono essere generate da IA (es. ChatGPT, Copilot, Claude) o create manualmente.
+- Al momento sono supportati solo file `.html` e `.zip` contenenti HTML e JavaScript.
+- 🔜 **In arrivo**: supporto per altri formati (es. script Python con interfaccia web o applet in WebAssembly).
 
 ---
 
 ## ⚙️ Modalità d'uso
 
-🔗 **Online (consigliato):**  
+🔗 **Web App (consigliata):**  
 [https://mccoy88f.github.io/SAKAI/](https://mccoy88f.github.io/SAKAI/)
 
-💻 **Offline / Locale:**  
-Il file HTML è **completamente eseguibile in locale**: basta aprire `index.html` con il tuo browser preferito.
+💻 **Esecuzione locale:**  
+Apri il file `SAK Launcher - FINAL V2.html` direttamente nel tuo browser. Nessuna installazione richiesta.
 
-🔜 **In arrivo:**  
-Una **versione multipiattaforma** (Windows, macOS, Linux) realizzata con **Electron** è in fase di sviluppo.
-
----
-
-## 🔒 Privacy & Sicurezza
-
-- Nessun dato viene inviato al server o salvato online.
-- Tutte le app e i profili sono gestiti **esclusivamente nel browser**, tramite **LocalStorage**.
-- La versione online disponibile su GitHub Pages **non salva né raccoglie alcun dato personale**.
+🖥️ **In sviluppo:**  
+Una versione **multipiattaforma (Windows, macOS, Linux)** con tecnologia **Electron** per un’esperienza desktop nativa.
 
 ---
 
-## 🧪 Tecnologie usate
+## 🔐 Privacy e sicurezza
 
-- HTML5, CSS3 (con animazioni e gradienti dinamici)
-- JavaScript (programmazione orientata agli oggetti)
-- [JSZip](https://stuk.github.io/jszip/) per import/export dei profili
-- LocalStorage per persistenza client-side
+- Tutti i dati vengono **salvati in locale**, nel tuo browser, tramite **LocalStorage**.
+- Il link GitHub Pages non raccoglie né memorizza informazioni personali.
+- Puoi esportare le tue app in un profilo `.sakaiprofile` per backup o condivisione.
+
+---
+
+## 🧪 Tecnologie utilizzate
+
+- HTML5, CSS3 (UI moderna con animazioni e glassmorphism)
+- JavaScript (struttura OOP e modularità)
+- [JSZip](https://stuk.github.io/jszip/) per gestione dei profili e archivi
+- LocalStorage per la persistenza lato client
 
 ---
 
@@ -55,4 +67,4 @@ Creato da [McCoy88f](https://github.com/McCoy88f)
 
 ## 📄 Licenza
 
-Questo progetto è distribuito sotto licenza **MIT**.
+Distribuito sotto licenza **MIT**. Sentiti libero di contribuire, clonare o adattare.
