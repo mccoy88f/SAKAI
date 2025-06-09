@@ -29,6 +29,48 @@ Le applicazioni caricate in SAKAI vengono chiamate **SAK app**.
 
 ---
 
+## 🚀 Creare una SAK App Ottimale
+
+Per far sì che la tua SAK app si integri al meglio con il launcher, puoi arricchire il tuo file HTML con metadati specifici che SAKAI è in grado di leggere e visualizzare.
+
+### 📝 Nome, Autore e Descrizione
+
+SAKAI estrae le informazioni direttamente dai tag `<meta>` presenti nell'`<head>` del tuo file HTML.
+
+1.  **Nome App**: Viene ricavato direttamente dal nome del file (es. `mia-calcolatrice.html` diventerà "mia-calcolatrice").
+2.  **Autore**: Inserisci il tag `<meta name="author" content="...">`.
+3.  **Descrizione**: Inserisci il tag `<meta name="description" content="...">`.
+
+### 🖼️ Icona dell'App
+
+L'icona viene gestita con questa priorità:
+
+1.  **Favicon (consigliato)**: SAKAI cercherà un tag `<link rel="icon" href="...">` nel tuo HTML. Per risultati ottimali, usa un **URL assoluto** (es. un link a un'immagine su un CDN) o un'immagine codificata in **Data-URI**.
+2.  **Emoji di Fallback**: Se non viene trovata una favicon o se il link non è valido, SAKAI assegnerà un'emoji casuale all'app.
+3.  **Emoji personalizzata**: Puoi sempre cambiare l'icona con un'emoji a tua scelta dal pannello "Informazioni" dell'app (cliccando sulla `i`).
+
+### Esempio di un file `app.html` completo
+
+Ecco un esempio di `head` per un file HTML che sfrutta tutte le funzionalità di SAKAI:
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Mia Fantastica App</title>
+
+    <meta name="author" content="Mario Rossi">
+    <meta name="description" content="Questa è una breve descrizione della mia fantastica app che fa cose incredibili.">
+
+    <link rel="icon" href="[https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f680.png](https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f680.png)">
+
+</head>
+<body>
+    <h1>La Mia Fantastica App</h1>
+</body>
+</html>
+
 ## 📁 Creare una SAK App da file `.zip`
 
 Puoi importare anche app in formato `.zip`. Ecco come prepararle:
