@@ -8,13 +8,13 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/icons/sakai-icon.png",
+      "src": "https://mccoy88f.github.io/SAKAI/icons/sakai-icon.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icons/sakai-icon.png",
+      "src": "https://mccoy88f.github.io/SAKAI/icons/sakai-icon.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
