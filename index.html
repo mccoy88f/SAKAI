@@ -24,6 +24,7 @@
     
     <!-- External Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     
     <script>
         console.log('🔧 SAKAI: Inizializzazione...');
@@ -132,7 +133,7 @@
     </script>
 </head>
 <body>
-    <div class="container">
+    <div class="container" id="mainContainer">
         <!-- Home Screen -->
         <div class="home-screen" id="homeScreen">
             <div class="header-section has-apps" id="headerSection">
@@ -140,8 +141,21 @@
                 <div class="subtitle">Il tuo Swiss Army Knife digitale per app web</div>
             </div>
             
+            <!-- Search Bar -->
+            <div class="search-section" id="searchSection" style="display: none;">
+                <input type="text" id="searchInput" class="search-input" placeholder="🔍 Cerca app...">
+                <div class="filter-tags" id="filterTags"></div>
+            </div>
+            
             <div class="recent-apps has-apps" id="recentApps" style="display: flex;">
-                <div class="recent-title">Le tue app</div>
+                <div class="recent-header">
+                    <div class="recent-title">Le tue app</div>
+                    <div class="view-controls">
+                        <button class="view-btn active" onclick="launcher.setViewMode('grid')" title="Vista griglia">⊞</button>
+                        <button class="view-btn" onclick="launcher.setViewMode('list')" title="Vista lista">☰</button>
+                        <button class="view-btn" onclick="launcher.showFrameView()" title="Vista frame">⧉</button>
+                    </div>
+                </div>
                 <div class="app-list" id="appList"></div>
             </div>
 
@@ -174,6 +188,10 @@
                     <input type="file" id="fileInput" class="file-input" multiple accept=".html,.htm,.zip">
 
                     <div class="profile-buttons">
+                        <button class="profile-button settings-profile" onclick="launcher.showSettings()">
+                            ⚙️ Impostazioni
+                        </button>
+                        
                         <button class="profile-button close-profile" onclick="launcher.closeProfile()">
                             🔒 Chiudi profilo
                         </button>
@@ -183,6 +201,26 @@
                         </button>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Frame View -->
+        <div class="frame-view" id="frameView" style="display: none;">
+            <div class="frame-header">
+                <div class="frame-title">Vista Frame</div>
+                <div class="frame-controls">
+                    <select id="layoutSelect" onchange="launcher.changeFrameLayout(this.value)">
+                        <option value="2x1">2x1 - Due app orizzontali</option>
+                        <option value="1x2">1x2 - Due app verticali</option>
+                        <option value="3x1">3x1 - Tre app orizzontali</option>
+                        <option value="1x3">1x3 - Tre app verticali</option>
+                        <option value="2x2">2x2 - Quattro app</option>
+                    </select>
+                    <button class="frame-btn" onclick="launcher.exitFrameView()">✖ Esci</button>
+                </div>
+            </div>
+            <div class="frame-container" id="frameContainer">
+                <!-- I frame verranno generati dinamicamente -->
             </div>
         </div>
 
@@ -210,6 +248,11 @@
                         <input type="text" class="info-value editable-field" id="infoGenre" placeholder="Inserisci genere">
                     </div>
                     
+                    <div class="info-field" id="infoTagsField">
+                        <div class="info-label">Tags</div>
+                        <input type="text" class="info-value editable-field" id="infoTags" placeholder="Inserisci tags separati da virgola">
+                    </div>
+                    
                     <div class="info-field" id="infoDescriptionField">
                         <div class="info-label">Descrizione</div>
                         <textarea class="info-value editable-field info-description" id="infoDescription" placeholder="Inserisci descrizione" rows="3"></textarea>
@@ -218,6 +261,11 @@
                     <div class="info-field">
                         <div class="info-label">Data aggiunta</div>
                         <div class="info-value" id="infoDate">--</div>
+                    </div>
+                    
+                    <div class="info-field">
+                        <div class="info-label">Utilizzi</div>
+                        <div class="info-value" id="infoUsageCount">0</div>
                     </div>
                     
                     <div class="info-field" id="iconPickerField" style="display: none;">
@@ -254,11 +302,36 @@
                         <label class="webapp-label">URL</label>
                         <input type="url" id="webappUrl" class="webapp-input" placeholder="https://example.com">
                     </div>
+                    
+                    <div class="webapp-field">
+                        <label class="webapp-label">Tags (opzionale)</label>
+                        <input type="text" id="webappTags" class="webapp-input" placeholder="produttività, social, lavoro...">
+                    </div>
                 </div>
                 
                 <div class="webapp-actions">
                     <button class="webapp-btn primary" onclick="launcher.addWebApp()" id="addWebAppBtn">Aggiungi</button>
                     <button class="webapp-btn secondary" onclick="launcher.closeWebAppDialog()">Annulla</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Dialog -->
+        <div class="settings-dialog" id="settingsDialog">
+            <div class="settings-content">
+                <div class="settings-header">
+                    <div class="settings-title">⚙️ Impostazioni</div>
+                    <button class="settings-close" onclick="launcher.closeSettings()">✖</button>
+                </div>
+                
+                <div class="settings-tabs">
+                    <button class="settings-tab active" onclick="launcher.showSettingsTab('appearance')">🎨 Aspetto</button>
+                    <button class="settings-tab" onclick="launcher.showSettingsTab('backup')">☁️ Backup</button>
+                    <button class="settings-tab" onclick="launcher.showSettingsTab('stats')">📊 Statistiche</button>
+                </div>
+                
+                <div class="settings-tab-content" id="settingsTabContent">
+                    <!-- Content will be dynamically generated -->
                 </div>
             </div>
         </div>

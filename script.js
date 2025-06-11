@@ -4,9 +4,17 @@ class SAKLauncher {
         this.defaultEmojis = ['⚡', '🚀', '🎯', '💡', '🔧', '🎨', '📊', '🌟', '🔮', '🎪', '🎭', '🎪', '🎨', '🎯', '🚀', '⚡', '💫', '🌈', '🎲', '🎸', '🎹', '🎵', '🎬', '📱', '💻', '🖥️', '⌚', '📷', '🎮', '🕹️'];
         this.currentInfoApp = null;
         this.profileActive = localStorage.getItem('sakaiProfileActive') === 'true' || this.apps.length > 0;
+        this.viewMode = localStorage.getItem('sakaiViewMode') || 'grid';
+        this.theme = localStorage.getItem('sakaiTheme') || 'default';
+        this.frameLayout = '2x1';
+        this.framesContent = {};
+        this.stats = JSON.parse(localStorage.getItem('sakaiStats') || '{}');
+        this.filterTags = [];
         this.initializeEventListeners();
         this.renderAppList();
         this.registerServiceWorker();
+        this.applyTheme();
+        this.initializeSearch();
     }
 
     registerServiceWorker() {
@@ -51,6 +59,87 @@ class SAKLauncher {
                 this.closeWebAppDialog();
             }
         });
+
+        // Close settings dialog on outside click
+        document.getElementById('settingsDialog').addEventListener('click', (e) => {
+            if (e.target.id === 'settingsDialog') {
+                this.closeSettings();
+            }
+        });
+
+        // Search input
+        document.getElementById('searchInput')?.addEventListener('input', (e) => {
+            this.filterApps(e.target.value);
+        });
+    }
+
+    initializeSearch() {
+        if (this.apps.length > 0 && this.profileActive) {
+            document.getElementById('searchSection').style.display = 'block';
+            this.updateFilterTags();
+        }
+    }
+
+    updateFilterTags() {
+        const allTags = new Set();
+        this.apps.forEach(app => {
+            if (app.tags) {
+                app.tags.split(',').forEach(tag => {
+                    allTags.add(tag.trim());
+                });
+            }
+            if (app.genre) {
+                allTags.add(app.genre);
+            }
+        });
+
+        const filterTagsEl = document.getElementById('filterTags');
+        filterTagsEl.innerHTML = '';
+        
+        allTags.forEach(tag => {
+            const tagEl = document.createElement('div');
+            tagEl.className = 'filter-tag';
+            tagEl.textContent = tag;
+            tagEl.onclick = () => this.toggleFilterTag(tag, tagEl);
+            filterTagsEl.appendChild(tagEl);
+        });
+    }
+
+    toggleFilterTag(tag, element) {
+        const index = this.filterTags.indexOf(tag);
+        if (index > -1) {
+            this.filterTags.splice(index, 1);
+            element.classList.remove('active');
+        } else {
+            this.filterTags.push(tag);
+            element.classList.add('active');
+        }
+        this.filterApps(document.getElementById('searchInput').value);
+    }
+
+    filterApps(searchTerm) {
+        const appItems = document.querySelectorAll('.app-item');
+        const searchLower = searchTerm.toLowerCase();
+        
+        appItems.forEach((item, index) => {
+            const app = this.apps[index];
+            const matchesSearch = !searchTerm || 
+                app.name.toLowerCase().includes(searchLower) ||
+                (app.author && app.author.toLowerCase().includes(searchLower)) ||
+                (app.description && app.description.toLowerCase().includes(searchLower));
+            
+            const matchesTags = this.filterTags.length === 0 || 
+                this.filterTags.some(tag => 
+                    (app.tags && app.tags.includes(tag)) || 
+                    (app.genre === tag)
+                );
+            
+            item.style.display = matchesSearch && matchesTags ? 'flex' : 'none';
+        });
+    }
+
+    applyTheme() {
+        document.body.className = `theme-${this.theme}`;
     }
 
     async handleFiles(files) {
@@ -67,6 +156,7 @@ class SAKLauncher {
             }
         }
         this.renderAppList();
+        this.initializeSearch();
     }
 
     async importHTMLFile(file) {
@@ -97,7 +187,9 @@ class SAKLauncher {
             description: description,
             genre: genre,
             emoji: randomEmoji,
-            useCustomIcon: false
+            useCustomIcon: false,
+            usageCount: 0,
+            tags: ''
         };
 
         this.apps.unshift(app);
@@ -148,7 +240,9 @@ class SAKLauncher {
                         description: description,
                         genre: genre,
                         emoji: randomEmoji,
-                        useCustomIcon: false
+                        useCustomIcon: false,
+                        usageCount: 0,
+                        tags: ''
                     };
 
                     this.apps.unshift(app);
@@ -176,7 +270,9 @@ class SAKLauncher {
                 description: 'Archivio ZIP - Errore importazione',
                 genre: 'Archivio',
                 emoji: randomEmoji,
-                useCustomIcon: false
+                useCustomIcon: false,
+                usageCount: 0,
+                tags: ''
             };
 
             this.apps.unshift(app);
@@ -288,7 +384,204 @@ class SAKLauncher {
             this.profileActive = false;
             this.saveApps();
             this.renderAppList();
+            document.getElementById('searchSection').style.display = 'none';
         }
+    }
+
+    setViewMode(mode) {
+        this.viewMode = mode;
+        localStorage.setItem('sakaiViewMode', mode);
+        
+        // Update button states
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+        
+        // Update app list class
+        const appList = document.getElementById('appList');
+        if (mode === 'list') {
+            appList.classList.add('view-list');
+        } else {
+            appList.classList.remove('view-list');
+        }
+    }
+
+    showFrameView() {
+        document.getElementById('homeScreen').style.display = 'none';
+        document.getElementById('frameView').style.display = 'flex';
+        this.initializeFrames();
+    }
+
+    exitFrameView() {
+        document.getElementById('homeScreen').style.display = 'flex';
+        document.getElementById('frameView').style.display = 'none';
+        
+        // Clear frames
+        this.framesContent = {};
+        document.getElementById('frameContainer').innerHTML = '';
+    }
+
+    changeFrameLayout(layout) {
+        this.frameLayout = layout;
+        this.initializeFrames();
+    }
+
+    initializeFrames() {
+        const container = document.getElementById('frameContainer');
+        container.className = `frame-container layout-${this.frameLayout}`;
+        container.innerHTML = '';
+        
+        let frameCount = 0;
+        switch(this.frameLayout) {
+            case '2x1': frameCount = 2; break;
+            case '1x2': frameCount = 2; break;
+            case '3x1': frameCount = 3; break;
+            case '1x3': frameCount = 3; break;
+            case '2x2': frameCount = 4; break;
+        }
+        
+        for (let i = 0; i < frameCount; i++) {
+            const frame = this.createFrame(i);
+            container.appendChild(frame);
+        }
+        
+        // Make frames sortable
+        if (typeof Sortable !== 'undefined') {
+            new Sortable(container, {
+                animation: 150,
+                ghostClass: 'dragging',
+                onEnd: (evt) => {
+                    // Update frame content positions
+                    this.updateFramePositions();
+                }
+            });
+        }
+    }
+
+    createFrame(index) {
+        const frame = document.createElement('div');
+        frame.className = 'app-frame empty';
+        frame.id = `frame-${index}`;
+        frame.setAttribute('data-frame-index', index);
+        
+        const content = this.framesContent[index];
+        
+        if (content) {
+            frame.classList.remove('empty');
+            frame.innerHTML = `
+                <div class="frame-toolbar">
+                    <div class="frame-app-name">${content.name}</div>
+                    <div class="frame-actions">
+                        <button class="frame-action-btn" onclick="launcher.reloadFrame(${index})" title="Ricarica">🔄</button>
+                        <button class="frame-action-btn" onclick="launcher.maximizeFrame(${index})" title="Massimizza">⬜</button>
+                        <button class="frame-action-btn" onclick="launcher.closeFrame(${index})" title="Chiudi">✖</button>
+                    </div>
+                </div>
+                <div class="frame-content">
+                    <iframe src="${content.url}" allow="accelerometer; autoplay; camera; encrypted-media; fullscreen; geolocation; gyroscope; microphone; midi; payment; usb"></iframe>
+                </div>
+            `;
+        } else {
+            frame.innerHTML = `
+                <div class="empty-frame-content" onclick="launcher.selectAppForFrame(${index})">
+                    <div class="empty-frame-icon">+</div>
+                    <div class="empty-frame-text">Clicca per aggiungere app</div>
+                </div>
+            `;
+        }
+        
+        // Drag and drop
+        frame.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            frame.classList.add('drag-over');
+        });
+        
+        frame.addEventListener('dragleave', () => {
+            frame.classList.remove('drag-over');
+        });
+        
+        frame.addEventListener('drop', (e) => {
+            e.preventDefault();
+            frame.classList.remove('drag-over');
+            // Handle drop logic here
+        });
+        
+        return frame;
+    }
+
+    selectAppForFrame(frameIndex) {
+        const appNames = this.apps.map(app => app.name).join('\n');
+        const selection = prompt(`Seleziona un'app per questo frame:\n\n${appNames}\n\nInserisci il nome dell'app:`);
+        
+        if (selection) {
+            const app = this.apps.find(a => a.name.toLowerCase() === selection.toLowerCase());
+            if (app) {
+                this.loadAppInFrame(app, frameIndex);
+            } else {
+                alert('App non trovata!');
+            }
+        }
+    }
+
+    loadAppInFrame(app, frameIndex) {
+        const blob = new Blob([app.content], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        
+        this.framesContent[frameIndex] = {
+            name: app.name,
+            url: url,
+            appId: app.id
+        };
+        
+        // Update usage stats
+        this.updateAppUsage(app.id);
+        
+        // Re-render frame
+        const frame = document.getElementById(`frame-${frameIndex}`);
+        const newFrame = this.createFrame(frameIndex);
+        frame.replaceWith(newFrame);
+    }
+
+    reloadFrame(frameIndex) {
+        const iframe = document.querySelector(`#frame-${frameIndex} iframe`);
+        if (iframe) {
+            iframe.src = iframe.src;
+        }
+    }
+
+    maximizeFrame(frameIndex) {
+        const frame = document.getElementById(`frame-${frameIndex}`);
+        if (frame.style.gridColumn === 'span 1') {
+            frame.style.gridColumn = 'span 2';
+            frame.style.gridRow = 'span 2';
+        } else {
+            frame.style.gridColumn = 'span 1';
+            frame.style.gridRow = 'span 1';
+        }
+    }
+
+    closeFrame(frameIndex) {
+        delete this.framesContent[frameIndex];
+        const frame = document.getElementById(`frame-${frameIndex}`);
+        const newFrame = this.createFrame(frameIndex);
+        frame.replaceWith(newFrame);
+    }
+
+    updateFramePositions() {
+        // Update frame content based on new positions
+        const frames = document.querySelectorAll('.app-frame');
+        const newContent = {};
+        
+        frames.forEach((frame, index) => {
+            const oldIndex = parseInt(frame.getAttribute('data-frame-index'));
+            if (this.framesContent[oldIndex]) {
+                newContent[index] = this.framesContent[oldIndex];
+            }
+        });
+        
+        this.framesContent = newContent;
+        this.initializeFrames();
     }
 
     renderAppList() {
@@ -329,6 +622,12 @@ class SAKLauncher {
                 const authorInfo = app.author ? `<div class="app-author">di ${app.author}</div>` : '';
                 const genreInfo = app.genre ? `<div class="app-genre">${app.genre}</div>` : '';
                 
+                const tagsHtml = app.tags ? `
+                    <div class="app-tags">
+                        ${app.tags.split(',').map(tag => `<span class="app-tag">${tag.trim()}</span>`).join('')}
+                    </div>
+                ` : '';
+                
                 appItem.innerHTML = `
                     <div class="app-item-content">
                         <div class="app-icon">
@@ -340,6 +639,7 @@ class SAKLauncher {
                                 ${authorInfo}
                                 ${genreInfo}
                                 <div class="app-date">Aggiunta il ${app.dateAdded}</div>
+                                ${tagsHtml}
                             </div>
                         </div>
                     </div>
@@ -379,6 +679,7 @@ class SAKLauncher {
         document.getElementById('infoAppName').textContent = app.name;
         document.getElementById('infoAppType').textContent = app.type.toUpperCase();
         document.getElementById('infoDate').textContent = app.dateAdded;
+        document.getElementById('infoUsageCount').textContent = app.usageCount || 0;
         
         // Icona
         const infoIcon = document.getElementById('infoIcon');
@@ -387,6 +688,7 @@ class SAKLauncher {
         // Campi editabili
         document.getElementById('infoAuthor').value = app.author || '';
         document.getElementById('infoGenre').value = app.genre || '';
+        document.getElementById('infoTags').value = app.tags || '';
         document.getElementById('infoDescription').value = app.description || '';
         
         // Prepara il picker di icone
@@ -434,10 +736,12 @@ class SAKLauncher {
         // Salva i campi editabili
         this.currentInfoApp.author = document.getElementById('infoAuthor').value.trim() || null;
         this.currentInfoApp.genre = document.getElementById('infoGenre').value.trim() || null;
+        this.currentInfoApp.tags = document.getElementById('infoTags').value.trim() || '';
         this.currentInfoApp.description = document.getElementById('infoDescription').value.trim() || null;
         
         this.saveApps();
         this.renderAppList();
+        this.updateFilterTags();
         this.closeInfoPopup();
         
         // Mostra conferma
@@ -453,6 +757,7 @@ class SAKLauncher {
             this.apps = this.apps.filter(app => app.id !== this.currentInfoApp.id);
             this.saveApps();
             this.renderAppList();
+            this.updateFilterTags();
             this.closeInfoPopup();
         }
     }
@@ -491,19 +796,23 @@ class SAKLauncher {
         // Aggiungi file di metadati con info sulle app
         const profileData = {
             exportDate: new Date().toISOString(),
-            sakaiVersion: '1.0',
+            sakaiVersion: '2.0',
             profileType: 'sakai_profile',
             totalApps: this.apps.length,
+            theme: this.theme,
+            stats: this.stats,
             apps: this.apps.map(app => ({
                 name: app.name,
                 type: app.type,
                 author: app.author,
                 description: app.description,
                 genre: app.genre,
+                tags: app.tags,
                 dateAdded: app.dateAdded,
                 emoji: app.emoji,
                 useCustomIcon: app.useCustomIcon,
-                favicon: app.favicon // Salva anche la favicon nei metadati
+                favicon: app.favicon,
+                usageCount: app.usageCount || 0
             }))
         };
         
@@ -580,6 +889,16 @@ class SAKLauncher {
                             this.apps = [];
                             this.profileActive = true;
                             
+                            // Importa tema e statistiche se presenti
+                            if (profileData.theme) {
+                                this.theme = profileData.theme;
+                                this.applyTheme();
+                            }
+                            
+                            if (profileData.stats) {
+                                this.stats = profileData.stats;
+                            }
+                            
                             // Importa tutte le app HTML dal profilo
                             const htmlFiles = Object.keys(contents.files).filter(filename => 
                                 filename.endsWith('.html') || filename.endsWith('.htm')
@@ -619,8 +938,10 @@ class SAKLauncher {
                                     author: appMeta ? appMeta.author : this.extractAuthor(content),
                                     description: appMeta ? appMeta.description : this.extractDescription(content),
                                     genre: appMeta ? appMeta.genre : this.extractGenre(content),
+                                    tags: appMeta ? appMeta.tags : '',
                                     emoji: appMeta ? appMeta.emoji : this.getRandomEmoji(),
-                                    useCustomIcon: appMeta ? appMeta.useCustomIcon : false
+                                    useCustomIcon: appMeta ? appMeta.useCustomIcon : false,
+                                    usageCount: appMeta ? (appMeta.usageCount || 0) : 0
                                 };
 
                                 this.apps.push(app);
@@ -628,6 +949,7 @@ class SAKLauncher {
                             
                             this.saveApps();
                             this.renderAppList();
+                            this.initializeSearch();
                             
                             alert(`Profilo caricato con successo!\n${this.apps.length} app disponibili.`);
                         }
@@ -650,78 +972,9 @@ class SAKLauncher {
     }
 
     loadApp(app) {
-        // Apri l'app in una nuova finestra invece che in iframe
-        const blob = new Blob([app.content], { type: 'text/html' });
-        const url = URL.createObjectURL(blob);
+        // Update usage stats
+        this.updateAppUsage(app.id);
         
-        // Apri in una nuova finestra con dimensioni ottimali
-        const newWindow = window.open(
-            url, 
-            `sakai_app_${app.id}`, 
-            'width=1200,height=800,scrollbars=yes,resizable=yes,status=yes,location=yes,menubar=yes,toolbar=yes'
-        );
-        
-        // Pulisci l'URL dopo un po' di tempo
-        setTimeout(() => {
-            URL.revokeObjectURL(url);
-        }, 5000);
-        
-        // Verifica se la finestra si è aperta correttamente
-        if (!newWindow) {
-            // Fallback se il popup è bloccato
-            const userChoice = confirm(
-                `Il popup è stato bloccato dal browser.\n\n` +
-                `Vuoi scaricare "${app.name}" come file HTML da aprire manualmente?`
-            );
-            
-            if (userChoice) {
-                this.downloadAppAsHTML(app);
-            }
-        } else {
-            // Opzionale: aggiungi il titolo alla finestra quando si carica
-            newWindow.onload = () => {
-                try {
-                    newWindow.document.title = `${app.name} - SAKAI`;
-                } catch (e) {
-                    // Ignora errori di cross-origin
-                }
-            };
-        }
-    }
-
-    showAppOptions(appId) {
-        const app = this.apps.find(a => a.id === appId);
-        if (!app) return;
-        
-        const options = [
-            '🪟 Apri in nuova finestra (raccomandato)',
-            '📥 Scarica come file HTML',
-            '❌ Annulla'
-        ];
-        
-        const choice = prompt(
-            `Come vuoi aprire "${app.name}"?\n\n` +
-            '1. Apri in nuova finestra (raccomandato)\n' +
-            '2. Scarica come file HTML\n' +
-            '0. Annulla\n\n' +
-            'Digita il numero della tua scelta:'
-        );
-        
-        switch (choice) {
-            case '1':
-                this.loadApp(app);
-                break;
-            case '2':
-                this.downloadAppAsHTML(app);
-                break;
-            default:
-                // Annulla o input non valido
-                break;
-        }
-    }
-
-    // Versione migliorata della funzione loadApp
-    loadApp(app) {
         // Verifica se l'app è una web app (iframe) o app HTML locale
         if (app.type === 'webapp' && app.content.includes('<iframe')) {
             // Per le web app, estrai l'URL e aprilo direttamente
@@ -772,7 +1025,22 @@ class SAKLauncher {
         }
     }
 
-    // Nuova funzione per scaricare l'app come file HTML
+    updateAppUsage(appId) {
+        const app = this.apps.find(a => a.id === appId);
+        if (app) {
+            app.usageCount = (app.usageCount || 0) + 1;
+            this.saveApps();
+            
+            // Update global stats
+            const today = new Date().toISOString().split('T')[0];
+            if (!this.stats[today]) {
+                this.stats[today] = {};
+            }
+            this.stats[today][appId] = (this.stats[today][appId] || 0) + 1;
+            this.saveStats();
+        }
+    }
+
     downloadAppAsHTML(app) {
         const blob = new Blob([app.content], { type: 'text/html' });
         const url = URL.createObjectURL(blob);
@@ -793,19 +1061,15 @@ class SAKLauncher {
             this.apps = this.apps.filter(app => app.id !== id);
             this.saveApps();
             this.renderAppList();
+            this.updateFilterTags();
         }
-    }
-
-    goHome() {
-        // Questa funzione non è più necessaria dato che non usiamo più iframe
-        // ma la manteniamo per compatibilità
-        console.log('goHome chiamata - non più necessaria con il nuovo sistema');
     }
 
     showWebAppDialog() {
         document.getElementById('webappDialog').classList.add('show');
         document.getElementById('webappName').value = '';
         document.getElementById('webappUrl').value = '';
+        document.getElementById('webappTags').value = '';
     }
 
     closeWebAppDialog() {
@@ -815,6 +1079,7 @@ class SAKLauncher {
     async addWebApp() {
         let name = document.getElementById('webappName').value.trim();
         const url = document.getElementById('webappUrl').value.trim();
+        const tags = document.getElementById('webappTags').value.trim();
 
         if (!url) {
             alert('Inserisci l\'URL della web app.');
@@ -904,21 +1169,233 @@ class SAKLauncher {
             author: author,
             description: description || `Web App: ${name}`,
             genre: genre,
+            tags: tags,
             emoji: this.getRandomEmoji(),
-            useCustomIcon: false
+            useCustomIcon: false,
+            usageCount: 0
         };
 
         this.apps.unshift(app);
         this.saveApps();
         this.renderAppList();
+        this.updateFilterTags();
         this.closeWebAppDialog();
         
         alert(`Web App "${name}" aggiunta con successo!`);
     }
 
+    showSettings() {
+        document.getElementById('settingsDialog').classList.add('show');
+        this.showSettingsTab('appearance');
+    }
+
+    closeSettings() {
+        document.getElementById('settingsDialog').classList.remove('show');
+    }
+
+    showSettingsTab(tab) {
+        // Update tab buttons
+        document.querySelectorAll('.settings-tab').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+        
+        // Show tab content
+        const content = document.getElementById('settingsTabContent');
+        
+        switch(tab) {
+            case 'appearance':
+                content.innerHTML = `
+                    <h3>Tema</h3>
+                    <div class="theme-selector">
+                        <div class="theme-option ${this.theme === 'default' ? 'active' : ''}" onclick="launcher.setTheme('default')">
+                            <div class="theme-preview" style="background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);"></div>
+                            <div class="theme-name">Default</div>
+                        </div>
+                        <div class="theme-option ${this.theme === 'dark' ? 'active' : ''}" onclick="launcher.setTheme('dark')">
+                            <div class="theme-preview" style="background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);"></div>
+                            <div class="theme-name">Dark</div>
+                        </div>
+                        <div class="theme-option ${this.theme === 'ocean' ? 'active' : ''}" onclick="launcher.setTheme('ocean')">
+                            <div class="theme-preview" style="background: linear-gradient(135deg, #2193b0, #6dd5ed);"></div>
+                            <div class="theme-name">Ocean</div>
+                        </div>
+                        <div class="theme-option ${this.theme === 'sunset' ? 'active' : ''}" onclick="launcher.setTheme('sunset')">
+                            <div class="theme-preview" style="background: linear-gradient(135deg, #ff6b6b, #feca57, #ee5a6f);"></div>
+                            <div class="theme-name">Sunset</div>
+                        </div>
+                    </div>
+                `;
+                break;
+                
+            case 'backup':
+                content.innerHTML = `
+                    <h3>Backup e Sincronizzazione</h3>
+                    <div class="backup-options">
+                        <div class="backup-option" onclick="launcher.exportProfile()">
+                            <div class="backup-option-title">📦 Esporta profilo locale</div>
+                            <div class="backup-option-desc">Scarica il profilo come file .sakaiprofile</div>
+                        </div>
+                        <div class="backup-option" onclick="launcher.backupToGithubGist()">
+                            <div class="backup-option-title">📤 Backup su GitHub Gist</div>
+                            <div class="backup-option-desc">Salva il profilo su GitHub (richiede token)</div>
+                        </div>
+                        <div class="backup-option" onclick="launcher.restoreFromGithubGist()">
+                            <div class="backup-option-title">📥 Ripristina da GitHub Gist</div>
+                            <div class="backup-option-desc">Carica il profilo da GitHub</div>
+                        </div>
+                    </div>
+                `;
+                break;
+                
+            case 'stats':
+                const totalApps = this.apps.length;
+                const totalUsage = this.apps.reduce((sum, app) => sum + (app.usageCount || 0), 0);
+                const mostUsedApp = this.apps.reduce((max, app) => 
+                    (app.usageCount || 0) > (max.usageCount || 0) ? app : max
+                , this.apps[0] || {});
+                
+                content.innerHTML = `
+                    <h3>Statistiche</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">${totalApps}</div>
+                            <div class="stat-label">App totali</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${totalUsage}</div>
+                            <div class="stat-label">Utilizzi totali</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${mostUsedApp.name || 'N/A'}</div>
+                            <div class="stat-label">App più usata</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${Object.keys(this.stats).length}</div>
+                            <div class="stat-label">Giorni di utilizzo</div>
+                        </div>
+                    </div>
+                `;
+                break;
+        }
+    }
+
+    setTheme(theme) {
+        this.theme = theme;
+        localStorage.setItem('sakaiTheme', theme);
+        this.applyTheme();
+        
+        // Update theme selector
+        document.querySelectorAll('.theme-option').forEach(opt => {
+            opt.classList.remove('active');
+        });
+        event.currentTarget.classList.add('active');
+    }
+
+    async backupToGithubGist() {
+        const token = prompt('Inserisci il tuo GitHub Personal Access Token:\n\n(Necessario per salvare su GitHub)');
+        if (!token) return;
+        
+        try {
+            const profileData = {
+                exportDate: new Date().toISOString(),
+                sakaiVersion: '2.0',
+                profileType: 'sakai_profile',
+                totalApps: this.apps.length,
+                theme: this.theme,
+                stats: this.stats,
+                apps: this.apps
+            };
+            
+            const gistData = {
+                description: 'SAKAI Profile Backup',
+                public: false,
+                files: {
+                    'sakai_profile.json': {
+                        content: JSON.stringify(profileData, null, 2)
+                    }
+                }
+            };
+            
+            const response = await fetch('https://api.github.com/gists', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(gistData)
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                localStorage.setItem('sakaiGistId', result.id);
+                localStorage.setItem('sakaiGithubToken', token);
+                alert(`Backup completato!\n\nID Gist: ${result.id}\n\nSalva questo ID per ripristinare il profilo in futuro.`);
+            } else {
+                throw new Error('Errore nella creazione del Gist');
+            }
+        } catch (error) {
+            alert('Errore durante il backup su GitHub: ' + error.message);
+        }
+    }
+
+    async restoreFromGithubGist() {
+        const gistId = prompt('Inserisci l\'ID del Gist da ripristinare:', localStorage.getItem('sakaiGistId') || '');
+        if (!gistId) return;
+        
+        const token = prompt('Inserisci il tuo GitHub Personal Access Token:', localStorage.getItem('sakaiGithubToken') || '');
+        if (!token) return;
+        
+        try {
+            const response = await fetch(`https://api.github.com/gists/${gistId}`, {
+                headers: {
+                    'Authorization': `token ${token}`
+                }
+            });
+            
+            if (response.ok) {
+                const gist = await response.json();
+                const profileData = JSON.parse(gist.files['sakai_profile.json'].content);
+                
+                if (profileData.profileType === 'sakai_profile') {
+                    const confirmRestore = confirm(
+                        `Profilo SAKAI trovato:\n\n` +
+                        `• ${profileData.totalApps} app\n` +
+                        `• Backup del: ${new Date(profileData.exportDate).toLocaleString('it-IT')}\n\n` +
+                        `Vuoi ripristinare questo profilo?`
+                    );
+                    
+                    if (confirmRestore) {
+                        this.apps = profileData.apps;
+                        this.theme = profileData.theme || 'default';
+                        this.stats = profileData.stats || {};
+                        this.profileActive = true;
+                        
+                        this.saveApps();
+                        this.saveStats();
+                        this.applyTheme();
+                        this.renderAppList();
+                        this.initializeSearch();
+                        this.closeSettings();
+                        
+                        alert('Profilo ripristinato con successo!');
+                    }
+                }
+            } else {
+                throw new Error('Gist non trovato o non accessibile');
+            }
+        } catch (error) {
+            alert('Errore durante il ripristino da GitHub: ' + error.message);
+        }
+    }
+
     saveApps() {
         localStorage.setItem('sakApps', JSON.stringify(this.apps));
         localStorage.setItem('sakaiProfileActive', this.profileActive.toString());
+    }
+
+    saveStats() {
+        localStorage.setItem('sakaiStats', JSON.stringify(this.stats));
     }
 }
 
@@ -931,6 +1408,13 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('✅ JSZip disponibile');
     } else {
         console.warn('⚠️ JSZip non disponibile - funzionalità ZIP limitate');
+    }
+    
+    // Controlla Sortable
+    if (typeof Sortable !== 'undefined') {
+        console.log('✅ Sortable disponibile');
+    } else {
+        console.warn('⚠️ Sortable non disponibile - drag & drop disabilitato');
     }
     
     // Inizializza l'applicazione
