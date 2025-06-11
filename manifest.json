@@ -1,7 +1,7 @@
 {
   "name": "SAKAI",
   "short_name": "SAKAI",
-  "start_url": "./",
+  "start_url": "https://mccoy88f.github.io/SAKAI/",
   "display": "standalone",
   "background_color": "#667eea",
   "theme_color": "#667eea",
