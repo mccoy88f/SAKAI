@@ -1,9 +1,26 @@
 <!DOCTYPE html>
-<!-- saved from url=(0058)file:///Users/antonello/Downloads/sak_launcher%20(10).html -->
-<html lang="it"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAK Launcher</title>
+    <meta name="theme-color" content="#667eea">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="application-name" content="SAKAI">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SAKAI">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="msapplication-TileColor" content="#667eea">
+    
+    <!-- PWA Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' fill='%23667eea'/><text x='90' y='120' text-anchor='middle' font-size='80' fill='white'>🔧</text></svg>">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23667eea'/><text x='16' y='24' text-anchor='middle' font-size='20' fill='white'>🔧</text></svg>">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22SAKAI%22,%22short_name%22:%22SAKAI%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23667eea%22,%22theme_color%22:%22%23667eea%22,%22icons%22:[{%22src%22:%22data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' fill='%23667eea'/><text x='256' y='340' text-anchor='middle' font-size='240' fill='white'>🔧</text></svg>%22,%22sizes%22:%22512x512%22,%22type%22:%22image/svg+xml%22}]}">
+    
+    <title>SAKAI</title>
     <style>
         * {
             margin: 0;
@@ -174,6 +191,7 @@
             margin-top: 20px;
             width: 100%;
             max-width: 500px;
+            flex-direction: column;
         }
 
         .choice-button {
@@ -239,6 +257,7 @@
             margin-top: 20px;
             width: 100%;
             max-width: 500px;
+            flex-direction: column;
         }
 
         .profile-button {
@@ -296,6 +315,7 @@
             width: 100%;
             max-width: 650px;
             margin-bottom: 10px;
+            flex-direction: column;
         }
 
         .webapp-button {
@@ -339,6 +359,7 @@
             display: none;
             flex-direction: column;
             height: 100vh;
+            position: relative;
         }
 
         .app-header {
@@ -349,10 +370,18 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
             min-height: 60px;
             z-index: 1000;
-            position: relative;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .app-header.visible {
+            transform: translateY(0);
         }
 
         .app-title {
@@ -392,6 +421,7 @@
             position: relative;
             overflow: hidden;
             border-radius: 0;
+            height: 100vh;
         }
 
         .app-frame {
@@ -400,6 +430,15 @@
             border: none;
             background: white;
             display: block;
+        }
+
+        .app-hover-area {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            z-index: 999;
         }
 
         /* Drag and Drop */
@@ -567,7 +606,7 @@
             gap: 8px;
         }
 
-        .info-app, .delete-app {
+        .info-app {
             backdrop-filter: blur(10px);
             color: white;
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -581,9 +620,6 @@
             align-items: center;
             justify-content: center;
             transition: all 0.3s ease;
-        }
-
-        .info-app {
             background: rgba(59, 130, 246, 0.8);
             box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
         }
@@ -592,17 +628,6 @@
             background: rgba(59, 130, 246, 0.9);
             transform: scale(1.1);
             box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-        }
-
-        .delete-app {
-            background: rgba(255, 71, 87, 0.8);
-            box-shadow: 0 2px 8px rgba(255, 71, 87, 0.3);
-        }
-
-        .delete-app:hover {
-            background: rgba(255, 55, 66, 0.9);
-            transform: scale(1.1);
-            box-shadow: 0 4px 12px rgba(255, 71, 87, 0.4);
         }
 
         .app-info {
@@ -630,6 +655,13 @@
             font-weight: 500;
         }
 
+        .app-genre {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 400;
+            font-style: italic;
+        }
+
         .app-date {
             font-size: 0.8rem;
             color: rgba(255, 255, 255, 0.6);
@@ -649,6 +681,7 @@
             align-items: center;
             justify-content: center;
             z-index: 2000;
+            padding: 20px;
         }
 
         .info-popup.show {
@@ -661,7 +694,7 @@
             border-radius: 20px;
             padding: 30px;
             max-width: 500px;
-            width: 90%;
+            width: 100%;
             max-height: 80vh;
             overflow-y: auto;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
@@ -760,12 +793,29 @@
             font-style: italic;
         }
 
+        .editable-field {
+            padding: 8px 12px;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            background: white;
+            font-size: 1rem;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+
+        .editable-field:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
         .info-actions {
             display: flex;
             gap: 10px;
             margin-top: 20px;
             padding-top: 20px;
             border-top: 2px solid rgba(0, 0, 0, 0.1);
+            flex-wrap: wrap;
         }
 
         .info-button {
@@ -777,6 +827,7 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
+            min-width: 120px;
         }
 
         .info-button.primary {
@@ -787,6 +838,11 @@
         .info-button.secondary {
             background: rgba(0, 0, 0, 0.1);
             color: #333;
+        }
+
+        .info-button.danger {
+            background: linear-gradient(45deg, #ef4444, #dc2626);
+            color: white;
         }
 
         .info-button:hover {
@@ -826,29 +882,6 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
 
-        /* Credits */
-        .credits {
-            position: fixed;
-            bottom: 10px;
-            right: 15px;
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.6);
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-            z-index: 100;
-            pointer-events: none;
-        }
-
-        .credits a {
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            pointer-events: auto;
-            transition: color 0.3s ease;
-        }
-
-        .credits a:hover {
-            color: rgba(255, 255, 255, 1);
-        }
-
         /* Web App Dialog */
         .webapp-dialog {
             position: fixed;
@@ -862,6 +895,7 @@
             align-items: center;
             justify-content: center;
             z-index: 2000;
+            padding: 20px;
         }
 
         .webapp-dialog.show {
@@ -874,7 +908,7 @@
             border-radius: 20px;
             padding: 30px;
             max-width: 500px;
-            width: 90%;
+            width: 100%;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.3);
         }
@@ -935,6 +969,7 @@
             display: flex;
             gap: 10px;
             margin-top: 10px;
+            flex-direction: column;
         }
 
         .webapp-btn {
@@ -968,6 +1003,128 @@
             cursor: not-allowed;
             transform: none;
         }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            body.home-mode {
+                padding: 10px;
+            }
+
+            .container.home-mode {
+                height: calc(100vh - 20px);
+                border-radius: 20px;
+            }
+
+            .home-screen {
+                padding: 20px;
+            }
+
+            .logo {
+                font-size: 3rem;
+            }
+
+            .header-section.has-apps .logo {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .header-section.has-apps .subtitle {
+                font-size: 0.9rem;
+            }
+
+            .profile-choice {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .import-buttons {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .profile-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .webapp-actions {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .info-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .info-button {
+                min-width: auto;
+                width: 100%;
+            }
+
+            .app-item {
+                padding: 15px;
+            }
+
+            .app-icon {
+                width: 44px;
+                height: 44px;
+            }
+
+            .app-name {
+                font-size: 1rem;
+            }
+
+            .icon-picker-grid {
+                grid-template-columns: repeat(6, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .home-screen {
+                padding: 15px;
+            }
+
+            .logo {
+                font-size: 2.5rem;
+            }
+
+            .header-section.has-apps .logo {
+                font-size: 1.8rem;
+            }
+
+            .app-item {
+                padding: 12px;
+            }
+
+            .app-item-content {
+                gap: 12px;
+            }
+
+            .app-icon {
+                width: 40px;
+                height: 40px;
+            }
+
+            .app-icon .emoji {
+                font-size: 24px;
+            }
+
+            .icon-picker-grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+
+            .info-content {
+                padding: 20px;
+            }
+
+            .webapp-dialog-content {
+                padding: 20px;
+            }
+        }
     </style>
 </head>
 <body class="home-mode">
@@ -991,7 +1148,7 @@
                         ➕ Crea nuovo profilo
                     </button>
                     
-                    <button class="choice-button open-profile" onclick="document.getElementById(&#39;profileInput&#39;).click()">
+                    <button class="choice-button open-profile" onclick="document.getElementById('profileInput').click()">
                         📂 Apri profilo
                     </button>
                     
@@ -1001,7 +1158,7 @@
                 <!-- Stato con profilo aperto -->
                 <div class="profile-active" id="profileActive" style="display: flex;">
                     <div class="import-buttons">
-                        <button class="import-button" onclick="document.getElementById(&#39;fileInput&#39;).click()">
+                        <button class="import-button" onclick="document.getElementById('fileInput').click()">
                             🔧 Importa una app SAKAI
                         </button>
                         
@@ -1010,7 +1167,7 @@
                         </button>
                     </div>
                     
-                    <input type="file" id="fileInput" class="file-input" multiple="" accept=".html,.htm,.zip">
+                    <input type="file" id="fileInput" class="file-input" multiple accept=".html,.htm,.zip">
                     
                     <div class="drop-zone" id="dropZone">
                         <div class="drop-text">Oppure trascina qui i tuoi file HTML/ZIP</div>
@@ -1032,7 +1189,8 @@
 
         <!-- App Viewer -->
         <div class="app-viewer" id="appViewer">
-            <div class="app-header">
+            <div class="app-hover-area" id="appHoverArea"></div>
+            <div class="app-header" id="appHeader">
                 <div class="app-title" id="appTitle">SAKAI</div>
                 <button class="close-button" id="closeButton">×</button>
             </div>
@@ -1041,7 +1199,7 @@
                     <div class="spinner"></div>
                     <div>Caricamento app...</div>
                 </div>
-                <iframe class="app-frame" id="appFrame" sandbox="allow-scripts allow-same-origin allow-forms" src="./SAK Launcher_files/saved_resource.html"></iframe>
+                <iframe class="app-frame" id="appFrame" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
             </div>
         </div>
 
@@ -1061,12 +1219,17 @@
                 <div class="info-details">
                     <div class="info-field" id="infoAuthorField">
                         <div class="info-label">Autore</div>
-                        <div class="info-value" id="infoAuthor">Sconosciuto</div>
+                        <input type="text" class="info-value editable-field" id="infoAuthor" placeholder="Inserisci autore">
+                    </div>
+                    
+                    <div class="info-field" id="infoGenreField">
+                        <div class="info-label">Genere</div>
+                        <input type="text" class="info-value editable-field" id="infoGenre" placeholder="Inserisci genere">
                     </div>
                     
                     <div class="info-field" id="infoDescriptionField">
                         <div class="info-label">Descrizione</div>
-                        <div class="info-value info-description" id="infoDescription">Nessuna descrizione disponibile</div>
+                        <textarea class="info-value editable-field info-description" id="infoDescription" placeholder="Inserisci descrizione" rows="3"></textarea>
                     </div>
                     
                     <div class="info-field">
@@ -1084,13 +1247,10 @@
                 
                 <div class="info-actions">
                     <button class="info-button secondary" onclick="launcher.closeInfoPopup()">Chiudi</button>
+                    <button class="info-button primary" onclick="launcher.saveAppInfo()">Salva</button>
+                    <button class="info-button danger" onclick="launcher.deleteAppFromInfo()">Elimina</button>
                 </div>
             </div>
-        </div>
-
-        <!-- Credits -->
-        <div class="credits">
-            Realizzato da <a href="https://github.com/McCoy88f" target="_blank" rel="noopener noreferrer">McCoy88f</a> on Github
         </div>
 
         <!-- Web App Dialog -->
@@ -1114,14 +1274,14 @@
                 </div>
                 
                 <div class="webapp-actions">
-                    <button class="webapp-btn secondary" onclick="launcher.closeWebAppDialog()">Annulla</button>
                     <button class="webapp-btn primary" onclick="launcher.addWebApp()" id="addWebAppBtn">Aggiungi</button>
+                    <button class="webapp-btn secondary" onclick="launcher.closeWebAppDialog()">Annulla</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="./SAK Launcher_files/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script>
         class SAKLauncher {
             constructor() {
@@ -1131,6 +1291,23 @@
                 this.profileActive = localStorage.getItem('sakaiProfileActive') === 'true' || this.apps.length > 0;
                 this.initializeEventListeners();
                 this.renderAppList();
+                this.registerServiceWorker();
+            }
+
+            registerServiceWorker() {
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('data:text/javascript;base64,' + btoa(`
+                        self.addEventListener('install', event => {
+                            self.skipWaiting();
+                        });
+                        
+                        self.addEventListener('activate', event => {
+                            clients.claim();
+                        });
+                    `)).catch(() => {
+                        // Service worker registration failed, but app still works
+                    });
+                }
             }
 
             initializeEventListeners() {
@@ -1168,6 +1345,32 @@
                     this.goHome();
                 });
 
+                // App header hover functionality
+                const appHoverArea = document.getElementById('appHoverArea');
+                const appHeader = document.getElementById('appHeader');
+                let headerTimeout;
+
+                appHoverArea.addEventListener('mouseenter', () => {
+                    clearTimeout(headerTimeout);
+                    appHeader.classList.add('visible');
+                });
+
+                appHoverArea.addEventListener('mouseleave', () => {
+                    headerTimeout = setTimeout(() => {
+                        appHeader.classList.remove('visible');
+                    }, 2000);
+                });
+
+                appHeader.addEventListener('mouseenter', () => {
+                    clearTimeout(headerTimeout);
+                });
+
+                appHeader.addEventListener('mouseleave', () => {
+                    headerTimeout = setTimeout(() => {
+                        appHeader.classList.remove('visible');
+                    }, 2000);
+                });
+
                 // Close popup on outside click
                 document.getElementById('infoPopup').addEventListener('click', (e) => {
                     if (e.target.id === 'infoPopup') {
@@ -1201,12 +1404,19 @@
 
             async importHTMLFile(file) {
                 const content = await this.readFileAsText(file);
-                const appName = file.name.replace(/\.[^/.]+$/, "");
                 
-                // Estrai favicon dal contenuto HTML
+                // Estrai titolo dal contenuto HTML (prioritario sul nome file)
+                const titleMatch = content.match(/<title[^>]*>([^<]+)<\/title>/i);
+                const htmlTitle = titleMatch ? titleMatch[1].trim() : null;
+                
+                // Usa il titolo HTML se disponibile, altrimenti il nome del file
+                const appName = htmlTitle || file.name.replace(/\.[^/.]+$/, "");
+                
+                // Estrai metadati dal contenuto HTML
                 const favicon = this.extractFavicon(content);
                 const author = this.extractAuthor(content);
                 const description = this.extractDescription(content);
+                const genre = this.extractGenre(content);
                 const randomEmoji = this.getRandomEmoji();
                 
                 const app = {
@@ -1218,6 +1428,7 @@
                     favicon: favicon,
                     author: author,
                     description: description,
+                    genre: genre,
                     emoji: randomEmoji,
                     useCustomIcon: false
                 };
@@ -1242,11 +1453,18 @@
                             // Importa tutti i file HTML trovati
                             for (const filename of htmlFiles) {
                                 const content = await contents.files[filename].async('text');
-                                const appName = filename.replace(/\.[^/.]+$/, "").replace(/^.*\//, ""); // Rimuovi path
+                                
+                                // Estrai titolo dal contenuto HTML (prioritario sul nome file)
+                                const titleMatch = content.match(/<title[^>]*>([^<]+)<\/title>/i);
+                                const htmlTitle = titleMatch ? titleMatch[1].trim() : null;
+                                
+                                // Usa il titolo HTML se disponibile, altrimenti il nome del file
+                                const appName = htmlTitle || filename.replace(/\.[^/.]+$/, "").replace(/^.*\//, "");
                                 
                                 const favicon = this.extractFavicon(content);
                                 const author = this.extractAuthor(content);
                                 const description = this.extractDescription(content);
+                                const genre = this.extractGenre(content);
                                 const randomEmoji = this.getRandomEmoji();
                                 
                                 const app = {
@@ -1258,6 +1476,7 @@
                                     favicon: favicon,
                                     author: author,
                                     description: description,
+                                    genre: genre,
                                     emoji: randomEmoji,
                                     useCustomIcon: false
                                 };
@@ -1265,11 +1484,9 @@
                                 this.apps.unshift(app);
                             }
                         } else {
-                            // Nessun file HTML trovato
                             throw new Error('Nessun file HTML trovato nel ZIP');
                         }
                     } else {
-                        // JSZip non disponibile, fallback
                         throw new Error('JSZip non disponibile');
                     }
                 } catch (error) {
@@ -1287,6 +1504,7 @@
                         favicon: null,
                         author: null,
                         description: 'Archivio ZIP',
+                        genre: 'Archivio',
                         emoji: randomEmoji,
                         useCustomIcon: false
                     };
@@ -1298,18 +1516,14 @@
             }
 
             extractFavicon(htmlContent) {
-                // Cerca favicon nel contenuto HTML
                 const faviconRegex = /<link[^>]*rel=["'](?:shortcut )?icon["'][^>]*href=["']([^"']+)["'][^>]*>/i;
                 const match = htmlContent.match(faviconRegex);
                 
                 if (match && match[1]) {
                     let faviconUrl = match[1];
                     
-                    // Se è un percorso relativo, convertilo in data URL se possibile
-                    // oppure restituisci l'URL così com'è
                     if (!faviconUrl.startsWith('http') && !faviconUrl.startsWith('data:')) {
-                        // Per i percorsi relativi, proviamo con alcuni fallback comuni
-                        return null; // Per ora ritorniamo null per i percorsi relativi
+                        return null;
                     }
                     
                     return faviconUrl;
@@ -1319,7 +1533,6 @@
             }
 
             extractAuthor(htmlContent) {
-                // Cerca l'autore nei meta tag
                 const authorPatterns = [
                     /<meta[^>]*name=["']author["'][^>]*content=["']([^"']+)["'][^>]*>/i,
                     /<meta[^>]*content=["']([^"']+)["'][^>]*name=["']author["'][^>]*>/i,
@@ -1338,7 +1551,6 @@
             }
 
             extractDescription(htmlContent) {
-                // Cerca la descrizione nei meta tag
                 const descriptionPatterns = [
                     /<meta[^>]*name=["']description["'][^>]*content=["']([^"']+)["'][^>]*>/i,
                     /<meta[^>]*content=["']([^"']+)["'][^>]*name=["']description["'][^>]*>/i,
@@ -1347,6 +1559,26 @@
                 ];
                 
                 for (const pattern of descriptionPatterns) {
+                    const match = htmlContent.match(pattern);
+                    if (match && match[1] && match[1].trim()) {
+                        return match[1].trim();
+                    }
+                }
+                
+                return null;
+            }
+
+            extractGenre(htmlContent) {
+                const genrePatterns = [
+                    /<meta[^>]*name=["']genre["'][^>]*content=["']([^"']+)["'][^>]*>/i,
+                    /<meta[^>]*content=["']([^"']+)["'][^>]*name=["']genre["'][^>]*>/i,
+                    /<meta[^>]*name=["']category["'][^>]*content=["']([^"']+)["'][^>]*>/i,
+                    /<meta[^>]*content=["']([^"']+)["'][^>]*name=["']category["'][^>]*>/i,
+                    /<meta[^>]*property=["']article:section["'][^>]*content=["']([^"']+)["'][^>]*>/i,
+                    /<meta[^>]*content=["']([^"']+)["'][^>]*property=["']article:section["'][^>]*>/i
+                ];
+                
+                for (const pattern of genrePatterns) {
                     const match = htmlContent.match(pattern);
                     if (match && match[1] && match[1].trim()) {
                         return match[1].trim();
@@ -1425,6 +1657,7 @@
                         
                         const iconContent = this.getIconContent(app);
                         const authorInfo = app.author ? `<div class="app-author">di ${app.author}</div>` : '';
+                        const genreInfo = app.genre ? `<div class="app-genre">${app.genre}</div>` : '';
                         
                         appItem.innerHTML = `
                             <div class="app-item-content">
@@ -1435,13 +1668,13 @@
                                     <div class="app-name">${app.name}</div>
                                     <div class="app-meta">
                                         ${authorInfo}
+                                        ${genreInfo}
                                         <div class="app-date">Aggiunta il ${app.dateAdded}</div>
                                     </div>
                                 </div>
                             </div>
                             <div class="app-actions">
-                                <button class="info-app" onclick="launcher.showAppInfo('${app.id}')" title="Informazioni app">i</button>
-                                <button class="delete-app" onclick="launcher.deleteApp('${app.id}')" title="Elimina app">×</button>
+                                <button class="info-app" onclick="launcher.showAppInfo('${app.id}')" title="Informazioni e gestione app">i</button>
                             </div>
                         `;
                         
@@ -1481,25 +1714,10 @@
                 const infoIcon = document.getElementById('infoIcon');
                 infoIcon.innerHTML = this.getIconContent(app);
                 
-                // Autore
-                const authorField = document.getElementById('infoAuthorField');
-                const authorValue = document.getElementById('infoAuthor');
-                if (app.author) {
-                    authorField.style.display = 'flex';
-                    authorValue.textContent = app.author;
-                } else {
-                    authorField.style.display = 'none';
-                }
-                
-                // Descrizione
-                const descriptionField = document.getElementById('infoDescriptionField');
-                const descriptionValue = document.getElementById('infoDescription');
-                if (app.description) {
-                    descriptionField.style.display = 'flex';
-                    descriptionValue.textContent = app.description;
-                } else {
-                    descriptionField.style.display = 'none';
-                }
+                // Campi editabili
+                document.getElementById('infoAuthor').value = app.author || '';
+                document.getElementById('infoGenre').value = app.genre || '';
+                document.getElementById('infoDescription').value = app.description || '';
                 
                 // Prepara il picker di icone
                 const iconPickerGrid = document.getElementById('iconPickerGrid');
@@ -1531,23 +1749,41 @@
                 
                 this.currentInfoApp.emoji = emoji;
                 this.currentInfoApp.useCustomIcon = true;
-                this.saveApps();
                 
                 // Aggiorna l'icona nel popup
                 const infoIcon = document.getElementById('infoIcon');
                 infoIcon.innerHTML = this.getIconContent(this.currentInfoApp);
                 
-                // Aggiorna la lista
-                this.renderAppList();
-                
                 // Nascondi il picker
                 document.getElementById('iconPickerField').style.display = 'none';
             }
 
-            launchAppFromInfo() {
-                if (this.currentInfoApp) {
+            saveAppInfo() {
+                if (!this.currentInfoApp) return;
+                
+                // Salva i campi editabili
+                this.currentInfoApp.author = document.getElementById('infoAuthor').value.trim() || null;
+                this.currentInfoApp.genre = document.getElementById('infoGenre').value.trim() || null;
+                this.currentInfoApp.description = document.getElementById('infoDescription').value.trim() || null;
+                
+                this.saveApps();
+                this.renderAppList();
+                this.closeInfoPopup();
+                
+                // Mostra conferma
+                setTimeout(() => {
+                    alert('Informazioni salvate con successo!');
+                }, 100);
+            }
+
+            deleteAppFromInfo() {
+                if (!this.currentInfoApp) return;
+                
+                if (confirm(`Sei sicuro di voler eliminare "${this.currentInfoApp.name}"?`)) {
+                    this.apps = this.apps.filter(app => app.id !== this.currentInfoApp.id);
+                    this.saveApps();
+                    this.renderAppList();
                     this.closeInfoPopup();
-                    this.loadApp(this.currentInfoApp);
                 }
             }
 
@@ -1576,7 +1812,7 @@
                 
                 // Aggiungi ogni app come file HTML
                 this.apps.forEach((app, index) => {
-                    if (app.type === 'html') {
+                    if (app.type === 'html' || app.type === 'webapp') {
                         const filename = `${app.name.replace(/[^a-zA-Z0-9-_]/g, '_')}.html`;
                         zip.file(filename, app.content);
                     }
@@ -1593,9 +1829,11 @@
                         type: app.type,
                         author: app.author,
                         description: app.description,
+                        genre: app.genre,
                         dateAdded: app.dateAdded,
                         emoji: app.emoji,
-                        useCustomIcon: app.useCustomIcon
+                        useCustomIcon: app.useCustomIcon,
+                        favicon: app.favicon // Salva anche la favicon nei metadati
                     }))
                 };
                 
@@ -1612,13 +1850,16 @@
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
                 
-                alert(`Profilo con ${this.apps.length} app esportato con successo!`);
+                alert(`Profilo con ${this.apps.length} app esportato con successo come file .sakaiprofile!`);
             }
 
             async exportAppsAsSeparateFiles() {
-                // Fallback: esporta le app una per una
-                this.apps.forEach((app, index) => {
-                    if (app.type === 'html') {
+                // Fallback: esporta le app una per una se JSZip non è disponibile
+                alert('JSZip non disponibile. Esportazione come file HTML separati...');
+                
+                for (let i = 0; i < this.apps.length; i++) {
+                    const app = this.apps[i];
+                    if (app.type === 'html' || app.type === 'webapp') {
                         const blob = new Blob([app.content], { type: 'text/html' });
                         const url = URL.createObjectURL(blob);
                         const a = document.createElement('a');
@@ -1629,12 +1870,14 @@
                         document.body.removeChild(a);
                         URL.revokeObjectURL(url);
                         
-                        // Aggiungi un piccolo delay tra i download
-                        setTimeout(() => {}, 100 * index);
+                        // Aggiungi un delay tra i download per evitare problemi
+                        if (i < this.apps.length - 1) {
+                            await new Promise(resolve => setTimeout(resolve, 500));
+                        }
                     }
-                });
+                }
                 
-                alert(`${this.apps.length} app esportate come file separati!`);
+                alert(`${this.apps.length} app esportate come file HTML separati! (JSZip non disponibile per creare .sakaiprofile)`);
             }
 
             async importProfile(file) {
@@ -1674,22 +1917,38 @@
                                     
                                     for (const filename of htmlFiles) {
                                         const content = await contents.files[filename].async('text');
-                                        const appName = filename.replace(/\.[^/.]+$/, "");
                                         
-                                        // Cerca metadati dell'app nel profilo
+                                        // Estrai titolo dal contenuto HTML (prioritario sul nome file)
+                                        const titleMatch = content.match(/<title[^>]*>([^<]+)<\/title>/i);
+                                        const htmlTitle = titleMatch ? titleMatch[1].trim() : null;
+                                        const appName = htmlTitle || filename.replace(/\.[^/.]+$/, "");
+                                        
+                                        // Cerca metadati dell'app nel profilo usando il nome normalizzato
+                                        const normalizedFilename = filename.replace(/\.[^/.]+$/, "");
                                         const appMeta = profileData.apps.find(a => 
-                                            a.name.replace(/[^a-zA-Z0-9-_]/g, '_') === appName
+                                            a.name.replace(/[^a-zA-Z0-9-_]/g, '_') === normalizedFilename ||
+                                            a.name === appName ||
+                                            a.name === htmlTitle
                                         );
+                                        
+                                        // Estrai favicon dal contenuto se non presente nei metadati
+                                        let favicon = null;
+                                        if (appMeta && appMeta.favicon) {
+                                            favicon = appMeta.favicon;
+                                        } else {
+                                            favicon = this.extractFavicon(content);
+                                        }
                                         
                                         const app = {
                                             id: Date.now().toString() + '_' + Math.random().toString(36).substr(2, 9),
                                             name: appMeta ? appMeta.name : appName,
                                             content: content,
-                                            type: 'html',
+                                            type: appMeta ? appMeta.type : 'html',
                                             dateAdded: appMeta ? appMeta.dateAdded : new Date().toLocaleString('it-IT'),
-                                            favicon: this.extractFavicon(content),
+                                            favicon: favicon,
                                             author: appMeta ? appMeta.author : this.extractAuthor(content),
                                             description: appMeta ? appMeta.description : this.extractDescription(content),
+                                            genre: appMeta ? appMeta.genre : this.extractGenre(content),
                                             emoji: appMeta ? appMeta.emoji : this.getRandomEmoji(),
                                             useCustomIcon: appMeta ? appMeta.useCustomIcon : false
                                         };
@@ -1763,7 +2022,8 @@
             }
 
             deleteApp(id) {
-                if (confirm('Sei sicuro di voler eliminare questa app?')) {
+                const app = this.apps.find(a => a.id === id);
+                if (app && confirm(`Sei sicuro di voler eliminare "${app.name}"?`)) {
                     this.apps = this.apps.filter(app => app.id !== id);
                     this.saveApps();
                     this.renderAppList();
@@ -1774,6 +2034,7 @@
                 const homeScreen = document.getElementById('homeScreen');
                 const appViewer = document.getElementById('appViewer');
                 const appFrame = document.getElementById('appFrame');
+                const appHeader = document.getElementById('appHeader');
                 const container = document.querySelector('.container');
                 const body = document.body;
                 
@@ -1784,28 +2045,22 @@
                 homeScreen.style.display = 'flex';
                 appViewer.style.display = 'none';
                 appFrame.src = '';
+                appHeader.classList.remove('visible');
                 
                 // Reset sandbox
                 appFrame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms');
             }
 
-            
             showWebAppDialog() {
                 document.getElementById('webappDialog').classList.add('show');
+                document.getElementById('webappName').value = '';
+                document.getElementById('webappUrl').value = '';
             }
 
             closeWebAppDialog() {
                 document.getElementById('webappDialog').classList.remove('show');
             }
 
-            
-
-
-            
-            async 
-
-
-            
             async addWebApp() {
                 let name = document.getElementById('webappName').value.trim();
                 const url = document.getElementById('webappUrl').value.trim();
@@ -1818,37 +2073,52 @@
                 let favicon = null;
                 let description = null;
                 let pageTitle = '';
+                let author = null;
+                let genre = 'Web App';
 
                 try {
-                    const response = await fetch(url);
-                    const htmlText = await response.text();
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(htmlText, 'text/html');
+                    // Prova a fare una richiesta CORS-friendly
+                    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+                    const response = await fetch(proxyUrl);
+                    const data = await response.json();
+                    const htmlText = data.contents;
+                    
+                    if (htmlText) {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(htmlText, 'text/html');
 
-                    // Titolo pagina
-                    pageTitle = doc.querySelector('title')?.textContent?.trim() || '';
+                        // Titolo pagina
+                        pageTitle = doc.querySelector('title')?.textContent?.trim() || '';
 
-                    // Favicon
-                    const iconLink = doc.querySelector('link[rel~="icon"]');
-                    if (iconLink) {
-                        let href = iconLink.getAttribute('href');
-                        if (href) {
-                            if (href.startsWith('http') || href.startsWith('data:')) {
-                                favicon = href;
-                            } else {
-                                const baseUrl = new URL(url);
-                                favicon = new URL(href, baseUrl).href;
+                        // Favicon
+                        const iconLink = doc.querySelector('link[rel~="icon"]');
+                        if (iconLink) {
+                            let href = iconLink.getAttribute('href');
+                            if (href) {
+                                if (href.startsWith('http') || href.startsWith('data:')) {
+                                    favicon = href;
+                                } else {
+                                    const baseUrl = new URL(url);
+                                    favicon = new URL(href, baseUrl).href;
+                                }
                             }
                         }
-                    }
 
-                    // Description
-                    const descMeta = doc.querySelector('meta[name="description"], meta[property="og:description"]');
-                    if (descMeta) {
-                        description = descMeta.getAttribute('content');
+                        // Description
+                        const descMeta = doc.querySelector('meta[name="description"], meta[property="og:description"]');
+                        if (descMeta) {
+                            description = descMeta.getAttribute('content');
+                        }
+
+                        // Author
+                        const authorMeta = doc.querySelector('meta[name="author"]');
+                        if (authorMeta) {
+                            author = authorMeta.getAttribute('content');
+                        }
                     }
                 } catch (e) {
                     console.warn('Impossibile recuperare favicon o metadati:', e);
+                    // Continua senza metadati
                 }
 
                 if (!name && pageTitle) {
@@ -1856,19 +2126,33 @@
                 }
 
                 if (!name) {
-                    alert('Impossibile determinare un nome valido per l\'app.');
-                    return;
+                    name = new URL(url).hostname;
                 }
 
                 const app = {
                     id: Date.now().toString(),
                     name,
-                    content: `<html><body style='margin:0;padding:0;'><iframe src="${url}" style="width:100%;height:100vh;border:none;"></iframe></body></html>`,
+                    content: `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${name}</title>
+    <style>
+        body { margin: 0; padding: 0; overflow: hidden; }
+        iframe { width: 100%; height: 100vh; border: none; }
+    </style>
+</head>
+<body>
+    <iframe src="${url}" allow="accelerometer; autoplay; camera; encrypted-media; fullscreen; geolocation; gyroscope; microphone; midi; payment; usb"></iframe>
+</body>
+</html>`,
                     type: 'webapp',
                     dateAdded: new Date().toLocaleString('it-IT'),
                     favicon: favicon,
-                    author: url,
-                    description: description || 'Web App',
+                    author: author,
+                    description: description || `Web App: ${name}`,
+                    genre: genre,
                     emoji: this.getRandomEmoji(),
                     useCustomIcon: false
                 };
@@ -1877,8 +2161,9 @@
                 this.saveApps();
                 this.renderAppList();
                 this.closeWebAppDialog();
+                
+                alert(`Web App "${name}" aggiunta con successo!`);
             }
-
 
             saveApps() {
                 localStorage.setItem('sakApps', JSON.stringify(this.apps));
@@ -1893,6 +2178,5 @@
         document.body.classList.add('home-mode');
         document.querySelector('.container').classList.add('home-mode');
     </script>
-
-
-        </body></html>
+</body>
+</html>
