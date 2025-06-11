@@ -100,7 +100,11 @@ class SAKLauncher {
             const tagEl = document.createElement('div');
             tagEl.className = 'filter-tag';
             tagEl.textContent = tag;
-            tagEl.onclick = () => this.toggleFilterTag(tag, tagEl);
+            tagEl.onclick = () => {
+                if (window.launcher) {
+                    this.toggleFilterTag(tag, tagEl);
+                }
+            };
             filterTagsEl.appendChild(tagEl);
         });
     }
@@ -473,9 +477,9 @@ class SAKLauncher {
                 <div class="frame-toolbar">
                     <div class="frame-app-name">${content.name}</div>
                     <div class="frame-actions">
-                        <button class="frame-action-btn" onclick="launcher.reloadFrame(${index})" title="Ricarica">🔄</button>
-                        <button class="frame-action-btn" onclick="launcher.maximizeFrame(${index})" title="Massimizza">⬜</button>
-                        <button class="frame-action-btn" onclick="launcher.closeFrame(${index})" title="Chiudi">✖</button>
+                        <button class="frame-action-btn" onclick="if(window.launcher) window.launcher.reloadFrame(${index})" title="Ricarica">🔄</button>
+                        <button class="frame-action-btn" onclick="if(window.launcher) window.launcher.maximizeFrame(${index})" title="Massimizza">⬜</button>
+                        <button class="frame-action-btn" onclick="if(window.launcher) window.launcher.closeFrame(${index})" title="Chiudi">✖</button>
                     </div>
                 </div>
                 <div class="frame-content">
@@ -484,7 +488,7 @@ class SAKLauncher {
             `;
         } else {
             frame.innerHTML = `
-                <div class="empty-frame-content" onclick="launcher.selectAppForFrame(${index})">
+                <div class="empty-frame-content" onclick="if(window.launcher) window.launcher.selectAppForFrame(${index})">
                     <div class="empty-frame-icon">+</div>
                     <div class="empty-frame-text">Clicca per aggiungere app</div>
                 </div>
@@ -644,7 +648,7 @@ class SAKLauncher {
                         </div>
                     </div>
                     <div class="app-actions">
-                        <button class="info-app" onclick="launcher.showAppInfo('${app.id}')" title="Informazioni e gestione app">i</button>
+                        <button class="info-app" onclick="if(window.launcher) window.launcher.showAppInfo('${app.id}')" title="Informazioni e gestione app">i</button>
                     </div>
                 `;
                 
@@ -694,7 +698,7 @@ class SAKLauncher {
         // Prepara il picker di icone
         const iconPickerGrid = document.getElementById('iconPickerGrid');
         iconPickerGrid.innerHTML = this.defaultEmojis.map(emoji => 
-            `<div class="icon-picker-option" onclick="launcher.changeAppIconFromInfo('${emoji}')">${emoji}</div>`
+            `<div class="icon-picker-option" onclick="if(window.launcher) window.launcher.changeAppIconFromInfo('${emoji}')">${emoji}</div>`
         ).join('');
         
         // Mostra popup
@@ -1208,19 +1212,19 @@ class SAKLauncher {
                 content.innerHTML = `
                     <h3>Tema</h3>
                     <div class="theme-selector">
-                        <div class="theme-option ${this.theme === 'default' ? 'active' : ''}" onclick="launcher.setTheme('default')">
+                        <div class="theme-option ${this.theme === 'default' ? 'active' : ''}" onclick="if(window.launcher) window.launcher.setTheme('default')">
                             <div class="theme-preview" style="background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);"></div>
                             <div class="theme-name">Default</div>
                         </div>
-                        <div class="theme-option ${this.theme === 'dark' ? 'active' : ''}" onclick="launcher.setTheme('dark')">
+                        <div class="theme-option ${this.theme === 'dark' ? 'active' : ''}" onclick="if(window.launcher) window.launcher.setTheme('dark')">
                             <div class="theme-preview" style="background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);"></div>
                             <div class="theme-name">Dark</div>
                         </div>
-                        <div class="theme-option ${this.theme === 'ocean' ? 'active' : ''}" onclick="launcher.setTheme('ocean')">
+                        <div class="theme-option ${this.theme === 'ocean' ? 'active' : ''}" onclick="if(window.launcher) window.launcher.setTheme('ocean')">
                             <div class="theme-preview" style="background: linear-gradient(135deg, #2193b0, #6dd5ed);"></div>
                             <div class="theme-name">Ocean</div>
                         </div>
-                        <div class="theme-option ${this.theme === 'sunset' ? 'active' : ''}" onclick="launcher.setTheme('sunset')">
+                        <div class="theme-option ${this.theme === 'sunset' ? 'active' : ''}" onclick="if(window.launcher) window.launcher.setTheme('sunset')">
                             <div class="theme-preview" style="background: linear-gradient(135deg, #ff6b6b, #feca57, #ee5a6f);"></div>
                             <div class="theme-name">Sunset</div>
                         </div>
@@ -1232,15 +1236,15 @@ class SAKLauncher {
                 content.innerHTML = `
                     <h3>Backup e Sincronizzazione</h3>
                     <div class="backup-options">
-                        <div class="backup-option" onclick="launcher.exportProfile()">
+                        <div class="backup-option" onclick="if(window.launcher) window.launcher.exportProfile()">
                             <div class="backup-option-title">📦 Esporta profilo locale</div>
                             <div class="backup-option-desc">Scarica il profilo come file .sakaiprofile</div>
                         </div>
-                        <div class="backup-option" onclick="launcher.backupToGithubGist()">
+                        <div class="backup-option" onclick="if(window.launcher) window.launcher.backupToGithubGist()">
                             <div class="backup-option-title">📤 Backup su GitHub Gist</div>
                             <div class="backup-option-desc">Salva il profilo su GitHub (richiede token)</div>
                         </div>
-                        <div class="backup-option" onclick="launcher.restoreFromGithubGist()">
+                        <div class="backup-option" onclick="if(window.launcher) window.launcher.restoreFromGithubGist()">
                             <div class="backup-option-title">📥 Ripristina da GitHub Gist</div>
                             <div class="backup-option-desc">Carica il profilo da GitHub</div>
                         </div>
