@@ -38,54 +38,6 @@ class SAKLauncher {
             }
         });
 
-        // Drag and drop
-        const dropZone = document.getElementById('dropZone');
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.classList.add('dragover');
-        });
-
-        dropZone.addEventListener('dragleave', () => {
-            dropZone.classList.remove('dragover');
-        });
-
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('dragover');
-            this.handleFiles(e.dataTransfer.files);
-        });
-
-        // Close button
-        document.getElementById('closeButton').addEventListener('click', () => {
-            this.goHome();
-        });
-
-        // App header hover functionality
-        const appHoverArea = document.getElementById('appHoverArea');
-        const appHeader = document.getElementById('appHeader');
-        let headerTimeout;
-
-        appHoverArea.addEventListener('mouseenter', () => {
-            clearTimeout(headerTimeout);
-            appHeader.classList.add('visible');
-        });
-
-        appHoverArea.addEventListener('mouseleave', () => {
-            headerTimeout = setTimeout(() => {
-                appHeader.classList.remove('visible');
-            }, 2000);
-        });
-
-        appHeader.addEventListener('mouseenter', () => {
-            clearTimeout(headerTimeout);
-        });
-
-        appHeader.addEventListener('mouseleave', () => {
-            headerTimeout = setTimeout(() => {
-                appHeader.classList.remove('visible');
-            }, 2000);
-        });
-
         // Close popup on outside click
         document.getElementById('infoPopup').addEventListener('click', (e) => {
             if (e.target.id === 'infoPopup') {
@@ -984,11 +936,4 @@ document.addEventListener('DOMContentLoaded', function() {
     // Inizializza l'applicazione
     window.launcher = new SAKLauncher();
     console.log('✅ SAKLauncher inizializzato con successo');
-    
-    // Imposta modalità home all'avvio
-    document.body.classList.add('home-mode');
-    const container = document.querySelector('.container');
-    if (container) {
-        container.classList.add('home-mode');
-    }
 });
