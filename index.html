@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#667eea">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="application-name" content="SAKAI">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SAKAI">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="msapplication-TileColor" content="#667eea">
+    
+    <!-- PWA Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' fill='%23667eea'/><text x='90' y='120' text-anchor='middle' font-size='80' fill='white'>🔧</text></svg>">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23667eea'/><text x='16' y='24' text-anchor='middle' font-size='20' fill='white'>🔧</text></svg>">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22SAKAI%22,%22short_name%22:%22SAKAI%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23667eea%22,%22theme_color%22:%22%23667eea%22,%22icons%22:[{%22src%22:%22data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' fill='%23667eea'/><text x='256' y='340' text-anchor='middle' font-size='240' fill='white'>🔧</text></svg>%22,%22sizes%22:%22512x512%22,%22type%22:%22image/svg+xml%22}]}">
+    
+    <title>SAKAI</title>
+    
+    <!-- CSS Fallback System -->
+    <link id="localCSS" rel="stylesheet" href="style.css" onerror="loadFallbackCSS()">
+    
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    
+    <script>
+        // Funzione per caricare CSS di fallback
+        function loadFallbackCSS() {
+            console.log('CSS locale non trovato, carico da GitHub...');
+            const fallbackCSS = document.createElement('link');
+            fallbackCSS.rel = 'stylesheet';
+            fallbackCSS.href = 'https://mccoy88f.github.io/SAKAI/style.css';
+            fallbackCSS.onerror = function() {
+                console.error('Impossibile caricare CSS da GitHub');
+                // Mostra un messaggio di errore all'utente
+                document.body.innerHTML = '<div style="padding: 20px; text-align: center; font-family: Arial;"><h1>Errore di caricamento</h1><p>Impossibile caricare i file CSS. Controlla la connessione internet.</p></div>';
+            };
+            document.head.appendChild(fallbackCSS);
+            
+            // Rimuovi il link CSS locale fallito
+            const localCSS = document.getElementById('localCSS');
+            if (localCSS) {
+                localCSS.remove();
+            }
+        }
+
+        // Funzione per caricare JavaScript con fallback
+        function loadJavaScript() {
+            const script = document.createElement('script');
+            script.src = 'script.js';
+            script.onerror = function() {
+                console.log('JavaScript locale non trovato, carico da GitHub...');
+                const fallbackScript = document.createElement('script');
+                fallbackScript.src = 'https://mccoy88f.github.io/SAKAI/script.js';
+                fallbackScript.onerror = function() {
+                    console.error('Impossibile caricare JavaScript da GitHub');
+                    // Mostra un messaggio di errore all'utente
+                    const errorDiv = document.createElement('div');
+                    errorDiv.style.cssText = 'position: fixed; top: 10px; right: 10px; background: red; color: white; padding: 10px; border-radius: 5px; z-index: 9999;';
+                    errorDiv.textContent = 'Errore: Impossibile caricare JavaScript';
+                    document.body.appendChild(errorDiv);
+                };
+                document.head.appendChild(fallbackScript);
+            };
+            document.head.appendChild(script);
+        }
+
+        // Carica JavaScript quando il DOM è pronto
+        document.addEventListener('DOMContentLoaded', loadJavaScript);
+    </script>
+</head>
+<body class="home-mode">
+    <div class="container home-mode">
+        <!-- Home Screen -->
+        <div class="home-screen" id="homeScreen">
+            <div class="header-section has-apps" id="headerSection">
+                <div class="logo">SAKAI</div>
+                <div class="subtitle">Il tuo Swiss Army Knife digitale per app web</div>
+            </div>
+            
+            <div class="recent-apps has-apps" id="recentApps" style="display: flex;">
+                <div class="recent-title">Le tue app</div>
+                <div class="app-list" id="appList"></div>
+            </div>
+
+            <div class="import-section has-apps" id="importSection">
+                <!-- Stato iniziale: scelta profilo -->
+                <div class="profile-choice" id="profileChoice" style="display: none;">
+                    <button class="choice-button new-profile" onclick="launcher.createNewProfile()">
+                        ➕ Crea nuovo profilo
+                    </button>
+                    
+                    <button class="choice-button open-profile" onclick="document.getElementById('profileInput').click()">
+                        📂 Apri profilo
+                    </button>
+                    
+                    <input type="file" id="profileInput" class="file-input" accept=".sakaiprofile">
+                </div>
+
+                <!-- Stato con profilo aperto -->
+                <div class="profile-active" id="profileActive" style="display: flex;">
+                    <div class="import-buttons">
+                        <button class="import-button" onclick="document.getElementById('fileInput').click()">
+                            🔧 Importa una app SAKAI
+                        </button>
+                        
+                        <button class="webapp-button" onclick="launcher.showWebAppDialog()">
+                            🌐 Aggiungi web app
+                        </button>
+                    </div>
+                    
+                    <input type="file" id="fileInput" class="file-input" multiple accept=".html,.htm,.zip">
+                    
+                    <div class="drop-zone" id="dropZone">
+                        <div class="drop-text">Oppure trascina qui i tuoi file HTML/ZIP</div>
+                        <small style="color: rgba(255, 255, 255, 0.6); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);">Supporta file HTML e archivi ZIP</small>
+                    </div>
+
+                    <div class="profile-buttons">
+                        <button class="profile-button close-profile" onclick="launcher.closeProfile()">
+                            🔒 Chiudi profilo
+                        </button>
+                        
+                        <button class="profile-button export-profile" onclick="launcher.exportProfile()">
+                            📦 Esporta profilo
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- App Viewer -->
+        <div class="app-viewer" id="appViewer">
+            <div class="app-hover-area" id="appHoverArea"></div>
+            <div class="app-header" id="appHeader">
+                <div class="app-title" id="appTitle">SAKAI</div>
+                <button class="close-button" id="closeButton">×</button>
+            </div>
+            <div class="app-content">
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <div>Caricamento app...</div>
+                </div>
+                <iframe class="app-frame" id="appFrame" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+            </div>
+        </div>
+
+        <!-- Info Popup -->
+        <div class="info-popup" id="infoPopup">
+            <div class="info-content">
+                <div class="info-header">
+                    <div class="info-icon" id="infoIcon" onclick="launcher.toggleIconPicker()">
+                        <!-- Icona dell'app -->
+                    </div>
+                    <div class="info-title">
+                        <div class="info-app-name" id="infoAppName">Nome App</div>
+                        <div class="info-app-type" id="infoAppType">HTML</div>
+                    </div>
+                </div>
+                
+                <div class="info-details">
+                    <div class="info-field" id="infoAuthorField">
+                        <div class="info-label">Autore</div>
+                        <input type="text" class="info-value editable-field" id="infoAuthor" placeholder="Inserisci autore">
+                    </div>
+                    
+                    <div class="info-field" id="infoGenreField">
+                        <div class="info-label">Genere</div>
+                        <input type="text" class="info-value editable-field" id="infoGenre" placeholder="Inserisci genere">
+                    </div>
+                    
+                    <div class="info-field" id="infoDescriptionField">
+                        <div class="info-label">Descrizione</div>
+                        <textarea class="info-value editable-field info-description" id="infoDescription" placeholder="Inserisci descrizione" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="info-field">
+                        <div class="info-label">Data aggiunta</div>
+                        <div class="info-value" id="infoDate">--</div>
+                    </div>
+                    
+                    <div class="info-field" id="iconPickerField" style="display: none;">
+                        <div class="info-label">Scegli icona</div>
+                        <div class="icon-picker-grid" id="iconPickerGrid">
+                            <!-- Emoji options -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-actions">
+                    <button class="info-button secondary" onclick="launcher.closeInfoPopup()">Chiudi</button>
+                    <button class="info-button primary" onclick="launcher.saveAppInfo()">Salva</button>
+                    <button class="info-button danger" onclick="launcher.deleteAppFromInfo()">Elimina</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Web App Dialog -->
+        <div class="webapp-dialog" id="webappDialog">
+            <div class="webapp-dialog-content">
+                <div class="webapp-dialog-header">
+                    <div class="webapp-dialog-title">🌐 Aggiungi Web App</div>
+                    <div class="webapp-dialog-subtitle">Inserisci nome e URL della web app</div>
+                </div>
+                
+                <div class="webapp-form">
+                    <div class="webapp-field">
+                        <label class="webapp-label">Nome App</label>
+                        <input type="text" id="webappName" class="webapp-input" placeholder="es. Gmail, YouTube, ChatGPT...">
+                    </div>
+                    
+                    <div class="webapp-field">
+                        <label class="webapp-label">URL</label>
+                        <input type="url" id="webappUrl" class="webapp-input" placeholder="https://example.com">
+                    </div>
+                </div>
+                
+                <div class="webapp-actions">
+                    <button class="webapp-btn primary" onclick="launcher.addWebApp()" id="addWebAppBtn">Aggiungi</button>
+                    <button class="webapp-btn secondary" onclick="launcher.closeWebAppDialog()">Annulla</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Caricamento JavaScript gestito da script in head -->
+</body>
+</html>
