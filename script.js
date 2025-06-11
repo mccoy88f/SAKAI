@@ -19,17 +19,13 @@ class SAKLauncher {
 
     registerServiceWorker() {
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('data:text/javascript;base64,' + btoa(`
-                self.addEventListener('install', event => {
-                    self.skipWaiting();
+            navigator.serviceWorker.register('./sw.js')
+                .then(registration => {
+                    console.log('✅ Service Worker registrato:', registration);
+                })
+                .catch(error => {
+                    console.log('❌ Service Worker registrazione fallita:', error);
                 });
-                
-                self.addEventListener('activate', event => {
-                    clients.claim();
-                });
-            `)).catch(() => {
-                // Service worker registration failed, but app still works
-            });
         }
     }
 
@@ -65,11 +61,6 @@ class SAKLauncher {
             if (e.target.id === 'settingsDialog') {
                 this.closeSettings();
             }
-        });
-
-        // Search input
-        document.getElementById('searchInput')?.addEventListener('input', (e) => {
-            this.filterApps(e.target.value);
         });
     }
 
@@ -399,8 +390,12 @@ class SAKLauncher {
         // Update button states
         document.querySelectorAll('.view-btn').forEach(btn => {
             btn.classList.remove('active');
+            // Check which button corresponds to the mode
+            if ((mode === 'grid' && btn.textContent.includes('⊞')) ||
+                (mode === 'list' && btn.textContent.includes('☰'))) {
+                btn.classList.add('active');
+            }
         });
-        event.target.classList.add('active');
         
         // Update app list class
         const appList = document.getElementById('appList');
@@ -1202,7 +1197,15 @@ class SAKLauncher {
         document.querySelectorAll('.settings-tab').forEach(btn => {
             btn.classList.remove('active');
         });
-        event.target.classList.add('active');
+        
+        // Find and activate the clicked tab
+        const tabButtons = document.querySelectorAll('.settings-tab');
+        tabButtons.forEach(btn => {
+            if (btn.textContent.includes(tab === 'appearance' ? 'Aspetto' : 
+                                       tab === 'backup' ? 'Backup' : 'Statistiche')) {
+                btn.classList.add('active');
+            }
+        });
         
         // Show tab content
         const content = document.getElementById('settingsTabContent');
@@ -1292,8 +1295,11 @@ class SAKLauncher {
         // Update theme selector
         document.querySelectorAll('.theme-option').forEach(opt => {
             opt.classList.remove('active');
+            if (opt.querySelector('.theme-name').textContent.toLowerCase() === theme ||
+                (theme === 'default' && opt.querySelector('.theme-name').textContent === 'Default')) {
+                opt.classList.add('active');
+            }
         });
-        event.currentTarget.classList.add('active');
     }
 
     async backupToGithubGist() {
