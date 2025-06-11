@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#667eea">
     
-    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#667eea">
     <meta name="application-name" content="SAKAI">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -13,247 +12,27 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="msapplication-TileColor" content="#667eea">
     
-    <!-- PWA Icons -->
     <link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' fill='%23667eea'/><text x='90' y='120' text-anchor='middle' font-size='80' fill='white'>🔧</text></svg>">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23667eea'/><text x='16' y='24' text-anchor='middle' font-size='20' fill='white'>🔧</text></svg>">
-    
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="./manifest.json">>>
+    <link rel="manifest" href="./manifest.json">
     
     <title>SAKAI</title>
     
-    <!-- External Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     
-    <script>
-        console.log('🔧 SAKAI: Inizializzazione...');
-        
-        // Funzione helper per chiamate sicure a launcher
-        window.safeLauncher = function(method, ...args) {
-            if (window.launcher && typeof window.launcher[method] === 'function') {
-                return window.launcher[method](...args);
-            } else {
-                console.warn(`Launcher non pronto o metodo ${method} non disponibile`);
-                if (!window.launcher) {
-                    alert('L\'app è ancora in caricamento. Riprova tra qualche istante.');
-                }
-            }
-        }
-        
-        // Funzione per caricare CSS con fallback migliorato
-        function loadCSS() {
-            console.log('📄 Tentativo caricamento CSS locale...');
-            
-            // Prova prima il CSS locale
-            fetch('./style.css')
-                .then(response => {
-                    if (response.ok) {
-                        console.log('✅ CSS locale trovato!');
-                        const link = document.createElement('link');
-                        link.rel = 'stylesheet';
-                        link.href = './style.css';
-                        document.head.appendChild(link);
-                    } else {
-                        throw new Error('CSS locale non trovato');
-                    }
-                })
-                .catch(() => {
-                    console.log('⚠️ CSS locale non trovato, carico da GitHub...');
-                    const link = document.createElement('link');
-                    link.rel = 'stylesheet';
-                    link.href = 'https://mccoy88f.github.io/SAKAI/style.css';
-                    link.onerror = function() {
-                        console.error('❌ Impossibile caricare CSS da GitHub');
-                        // CSS di emergenza inline
-                        const style = document.createElement('style');
-                        style.textContent = `
-                            body { 
-                                font-family: Arial, sans-serif; 
-                                background: linear-gradient(135deg, #667eea, #764ba2); 
-                                color: white; 
-                                padding: 20px; 
-                                text-align: center; 
-                            }
-                            .error { 
-                                background: rgba(255,255,255,0.1); 
-                                padding: 20px; 
-                                border-radius: 10px; 
-                                margin: 20px auto; 
-                                max-width: 600px; 
-                            }
-                        `;
-                        document.head.appendChild(style);
-                        document.body.innerHTML = `
-                            <div class="error">
-                                <h1>🔧 SAKAI</h1>
-                                <p>Impossibile caricare i file CSS. Controlla la connessione internet.</p>
-                                <button onclick="location.reload()">🔄 Riprova</button>
-                            </div>
-                        `;
-                    };
-                    link.onload = function() {
-                        console.log('✅ CSS da GitHub caricato!');
-                    };
-                    document.head.appendChild(link);
-                });
-        }
-
-        // Funzione per caricare JavaScript con fallback migliorato
-        function loadJavaScript() {
-            console.log('⚡ Tentativo caricamento JavaScript locale...');
-            
-            // Prova prima il JS locale
-            fetch('./script.js')
-                .then(response => {
-                    if (response.ok) {
-                        console.log('✅ JavaScript locale trovato!');
-                        const script = document.createElement('script');
-                        script.src = './script.js';
-                        script.onload = () => {
-                            console.log('✅ JavaScript locale caricato!');
-                            // Inizializza immediatamente dopo il caricamento
-                            initializeSAKLauncher();
-                        };
-                        document.head.appendChild(script);
-                    } else {
-                        throw new Error('JavaScript locale non trovato');
-                    }
-                })
-                .catch(() => {
-                    console.log('⚠️ JavaScript locale non trovato, carico da GitHub...');
-                    const script = document.createElement('script');
-                    script.src = 'https://mccoy88f.github.io/SAKAI/script.js';
-                    script.onerror = function() {
-                        console.error('❌ Impossibile caricare JavaScript da GitHub');
-                        initializeFallbackLauncher();
-                    };
-                    script.onload = function() {
-                        console.log('✅ JavaScript da GitHub caricato!');
-                        // Inizializza immediatamente dopo il caricamento
-                        initializeSAKLauncher();
-                    };
-                    document.head.appendChild(script);
-                });
-        }
-        
-        // Nuova funzione di inizializzazione
-        function initializeSAKLauncher() {
-            if (window.SAKLauncher) {
-                console.log('🚀 Inizializzazione SAKLauncher...');
-                window.launcher = new SAKLauncher();
-                console.log('✅ SAKLauncher inizializzato con successo');
-            } else {
-                console.error('❌ SAKLauncher non definito!');
-                initializeFallbackLauncher();
-            }
-        }
-
-        // Launcher di fallback minimale
-        function initializeFallbackLauncher() {
-            console.log('🚨 Inizializzazione launcher di fallback...');
-            window.launcher = {
-                createNewProfile: function() {
-                    alert('Creazione nuovo profilo...');
-                    localStorage.setItem('sakaiProfileActive', 'true');
-                    location.reload();
-                },
-                showWebAppDialog: function() {
-                    alert('Funzione non disponibile - ricarica la pagina');
-                },
-                closeProfile: function() {
-                    if(confirm('Chiudere il profilo?')) {
-                        localStorage.clear();
-                        location.reload();
-                    }
-                },
-                exportProfile: function() {
-                    alert('Funzione esportazione non disponibile - ricarica la pagina');
-                },
-                showSettings: function() {
-                    alert('Impostazioni non disponibili - ricarica la pagina');
-                },
-                setViewMode: function() { console.log('Vista non disponibile'); },
-                showFrameView: function() { console.log('Frame non disponibili'); },
-                changeFrameLayout: function() { console.log('Layout non disponibile'); },
-                exitFrameView: function() { console.log('Uscita frame non disponibile'); },
-                toggleIconPicker: function() { console.log('Picker non disponibile'); },
-                closeInfoPopup: function() { console.log('Chiusura popup non disponibile'); },
-                saveAppInfo: function() { console.log('Salvataggio non disponibile'); },
-                deleteAppFromInfo: function() { console.log('Eliminazione non disponibile'); },
-                addWebApp: function() { console.log('Aggiunta non disponibile'); },
-                closeWebAppDialog: function() { console.log('Chiusura dialog non disponibile'); },
-                closeSettings: function() { console.log('Chiusura impostazioni non disponibile'); },
-                showSettingsTab: function() { console.log('Tab non disponibile'); },
-                showAppInfo: function() { console.log('Info non disponibili'); },
-                changeAppIconFromInfo: function() { console.log('Cambio icona non disponibile'); },
-                reloadFrame: function() { console.log('Ricarica non disponibile'); },
-                maximizeFrame: function() { console.log('Massimizza non disponibile'); },
-                closeFrame: function() { console.log('Chiusura frame non disponibile'); },
-                selectAppForFrame: function() { console.log('Selezione non disponibile'); },
-                setTheme: function() { console.log('Tema non disponibile'); },
-                backupToGithubGist: function() { console.log('Backup non disponibile'); },
-                restoreFromGithubGist: function() { console.log('Ripristino non disponibile'); },
-                toggleFilterTag: function() { console.log('Filtro non disponibile'); },
-                filterApps: function() { console.log('Ricerca non disponibile'); }
-            };
-        }
-
-        // Carica i file quando il DOM è pronto
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 DOM pronto, carico risorse...');
-            
-            // Inizializza subito un launcher di base per evitare errori
-            window.launcher = {
-                createNewProfile: function() { console.log('Launcher in caricamento...'); },
-                showWebAppDialog: function() { console.log('Launcher in caricamento...'); },
-                closeProfile: function() { console.log('Launcher in caricamento...'); },
-                exportProfile: function() { console.log('Launcher in caricamento...'); },
-                showSettings: function() { console.log('Launcher in caricamento...'); },
-                setViewMode: function() { console.log('Launcher in caricamento...'); },
-                showFrameView: function() { console.log('Launcher in caricamento...'); },
-                changeFrameLayout: function() { console.log('Launcher in caricamento...'); },
-                exitFrameView: function() { console.log('Launcher in caricamento...'); },
-                toggleIconPicker: function() { console.log('Launcher in caricamento...'); },
-                closeInfoPopup: function() { console.log('Launcher in caricamento...'); },
-                saveAppInfo: function() { console.log('Launcher in caricamento...'); },
-                deleteAppFromInfo: function() { console.log('Launcher in caricamento...'); },
-                addWebApp: function() { console.log('Launcher in caricamento...'); },
-                closeWebAppDialog: function() { console.log('Launcher in caricamento...'); },
-                closeSettings: function() { console.log('Launcher in caricamento...'); },
-                showSettingsTab: function() { console.log('Launcher in caricamento...'); },
-                showAppInfo: function() { console.log('Launcher in caricamento...'); },
-                changeAppIconFromInfo: function() { console.log('Launcher in caricamento...'); },
-                reloadFrame: function() { console.log('Launcher in caricamento...'); },
-                maximizeFrame: function() { console.log('Launcher in caricamento...'); },
-                closeFrame: function() { console.log('Launcher in caricamento...'); },
-                selectAppForFrame: function() { console.log('Launcher in caricamento...'); },
-                setTheme: function() { console.log('Launcher in caricamento...'); },
-                backupToGithubGist: function() { console.log('Launcher in caricamento...'); },
-                restoreFromGithubGist: function() { console.log('Launcher in caricamento...'); },
-                toggleFilterTag: function() { console.log('Launcher in caricamento...'); },
-                filterApps: function() { console.log('Launcher in caricamento...'); }
-            };
-            
-            loadCSS();
-            
-            // Aspetta un po' prima di caricare JS per evitare conflitti
-            setTimeout(loadJavaScript, 100);
-        });
-    </script>
+    <link rel="stylesheet" href="./style.css">
 </head>
 <body>
     <div class="container" id="mainContainer">
-        <!-- Home Screen -->
         <div class="home-screen" id="homeScreen">
             <div class="header-section has-apps" id="headerSection">
                 <div class="logo">SAKAI</div>
                 <div class="subtitle">Il tuo Swiss Army Knife digitale per app web</div>
             </div>
             
-            <!-- Search Bar -->
             <div class="search-section" id="searchSection" style="display: none;">
-                <input type="text" id="searchInput" class="search-input" placeholder="🔍 Cerca app..." oninput="if(window.launcher && window.launcher.filterApps) window.launcher.filterApps(this.value)">
+                <input type="text" id="searchInput" class="search-input" placeholder="🔍 Cerca app..." oninput="launcher.filterApps(this.value)">
                 <div class="filter-tags" id="filterTags"></div>
             </div>
             
@@ -261,52 +40,44 @@
                 <div class="recent-header">
                     <div class="recent-title">Le tue app</div>
                     <div class="view-controls">
-                        <button class="view-btn active" onclick="safeLauncher('setViewMode', 'grid')" title="Vista griglia">⊞</button>
-                        <button class="view-btn" onclick="safeLauncher('setViewMode', 'list')" title="Vista lista">☰</button>
-                        <button class="view-btn" onclick="safeLauncher('showFrameView')" title="Vista frame">⧉</button>
+                        <button class="view-btn active" onclick="launcher.setViewMode('grid')" title="Vista griglia">⊞</button>
+                        <button class="view-btn" onclick="launcher.setViewMode('list')" title="Vista lista">☰</button>
+                        <button class="view-btn" onclick="launcher.showFrameView()" title="Vista frame">⧉</button>
                     </div>
                 </div>
                 <div class="app-list" id="appList"></div>
             </div>
 
             <div class="import-section has-apps" id="importSection">
-                <!-- Stato iniziale: scelta profilo -->
                 <div class="profile-choice" id="profileChoice" style="display: none;">
-                    <button class="choice-button new-profile" onclick="safeLauncher('createNewProfile')">
+                    <button class="choice-button new-profile" onclick="launcher.createNewProfile()">
                         ➕ Crea nuovo profilo
                     </button>
-                    
                     <button class="choice-button open-profile" onclick="document.getElementById('profileInput').click()">
                         📂 Apri profilo
                     </button>
-                    
                     <input type="file" id="profileInput" class="file-input" accept=".sakaiprofile">
                 </div>
 
-                <!-- Stato con profilo aperto -->
                 <div class="profile-active" id="profileActive" style="display: flex;">
                     <div class="import-buttons">
                         <button class="import-button" onclick="document.getElementById('fileInput').click()">
                             🔧 Importa una app SAKAI
                         </button>
-                        
-                        <button class="webapp-button" onclick="safeLauncher('showWebAppDialog')">
+                        <button class="webapp-button" onclick="launcher.showWebAppDialog()">
                             🌐 Aggiungi web app
                         </button>
                     </div>
-                    
                     <input type="file" id="fileInput" class="file-input" multiple accept=".html,.htm,.zip">
 
                     <div class="profile-buttons">
-                        <button class="profile-button settings-profile" onclick="safeLauncher('showSettings')">
+                        <button class="profile-button settings-profile" onclick="launcher.showSettings()">
                             ⚙️ Impostazioni
                         </button>
-                        
-                        <button class="profile-button close-profile" onclick="safeLauncher('closeProfile')">
+                        <button class="profile-button close-profile" onclick="launcher.closeProfile()">
                             🔒 Chiudi profilo
                         </button>
-                        
-                        <button class="profile-button export-profile" onclick="safeLauncher('exportProfile')">
+                        <button class="profile-button export-profile" onclick="launcher.exportProfile()">
                             📦 Esporta profilo
                         </button>
                     </div>
@@ -314,160 +85,113 @@
             </div>
         </div>
 
-        <!-- Frame View -->
         <div class="frame-view" id="frameView" style="display: none;">
             <div class="frame-header">
                 <div class="frame-title">Vista Frame</div>
                 <div class="frame-controls">
-                    <select id="layoutSelect" onchange="safeLauncher('changeFrameLayout', this.value)">
+                    <select id="layoutSelect" onchange="launcher.changeFrameLayout(this.value)">
                         <option value="2x1">2x1 - Due app orizzontali</option>
                         <option value="1x2">1x2 - Due app verticali</option>
                         <option value="3x1">3x1 - Tre app orizzontali</option>
                         <option value="1x3">1x3 - Tre app verticali</option>
                         <option value="2x2">2x2 - Quattro app</option>
                     </select>
-                    <button class="frame-btn" onclick="safeLauncher('exitFrameView')">✖ Esci</button>
+                    <button class="frame-btn" onclick="launcher.exitFrameView()">✖ Esci</button>
                 </div>
             </div>
-            <div class="frame-container" id="frameContainer">
-                <!-- I frame verranno generati dinamicamente -->
-            </div>
+            <div class="frame-container" id="frameContainer"></div>
         </div>
 
-        <!-- Info Popup -->
         <div class="info-popup" id="infoPopup">
             <div class="info-content">
                 <div class="info-header">
-                    <div class="info-icon" id="infoIcon" onclick="safeLauncher('toggleIconPicker')">
-                        <!-- Icona dell'app -->
-                    </div>
+                    <div class="info-icon" id="infoIcon" onclick="launcher.toggleIconPicker()"></div>
                     <div class="info-title">
                         <div class="info-app-name" id="infoAppName">Nome App</div>
                         <div class="info-app-type" id="infoAppType">HTML</div>
                     </div>
                 </div>
-                
                 <div class="info-details">
-                    <div class="info-field" id="infoAuthorField">
+                    <div class="info-field">
                         <div class="info-label">Autore</div>
                         <input type="text" class="info-value editable-field" id="infoAuthor" placeholder="Inserisci autore">
                     </div>
-                    
-                    <div class="info-field" id="infoGenreField">
+                    <div class="info-field">
                         <div class="info-label">Genere</div>
                         <input type="text" class="info-value editable-field" id="infoGenre" placeholder="Inserisci genere">
                     </div>
-                    
-                    <div class="info-field" id="infoTagsField">
+                    <div class="info-field">
                         <div class="info-label">Tags</div>
                         <input type="text" class="info-value editable-field" id="infoTags" placeholder="Inserisci tags separati da virgola">
                     </div>
-                    
-                    <div class="info-field" id="infoDescriptionField">
+                    <div class="info-field">
                         <div class="info-label">Descrizione</div>
                         <textarea class="info-value editable-field info-description" id="infoDescription" placeholder="Inserisci descrizione" rows="3"></textarea>
                     </div>
-                    
                     <div class="info-field">
                         <div class="info-label">Data aggiunta</div>
                         <div class="info-value" id="infoDate">--</div>
                     </div>
-                    
                     <div class="info-field">
                         <div class="info-label">Utilizzi</div>
                         <div class="info-value" id="infoUsageCount">0</div>
                     </div>
-                    
                     <div class="info-field" id="iconPickerField" style="display: none;">
                         <div class="info-label">Scegli icona</div>
-                        <div class="icon-picker-grid" id="iconPickerGrid">
-                            <!-- Emoji options -->
-                        </div>
+                        <div class="icon-picker-grid" id="iconPickerGrid"></div>
                     </div>
                 </div>
-                
                 <div class="info-actions">
-                    <button class="info-button secondary" onclick="safeLauncher('closeInfoPopup')">Chiudi</button>
-                    <button class="info-button primary" onclick="safeLauncher('saveAppInfo')">Salva</button>
-                    <button class="info-button danger" onclick="safeLauncher('deleteAppFromInfo')">Elimina</button>
+                    <button class="info-button secondary" onclick="launcher.closeInfoPopup()">Chiudi</button>
+                    <button class="info-button primary" onclick="launcher.saveAppInfo()">Salva</button>
+                    <button class="info-button danger" onclick="launcher.deleteAppFromInfo()">Elimina</button>
                 </div>
             </div>
         </div>
 
-        <!-- Web App Dialog -->
         <div class="webapp-dialog" id="webappDialog">
             <div class="webapp-dialog-content">
                 <div class="webapp-dialog-header">
                     <div class="webapp-dialog-title">🌐 Aggiungi Web App</div>
                     <div class="webapp-dialog-subtitle">Inserisci nome e URL della web app</div>
                 </div>
-                
                 <div class="webapp-form">
                     <div class="webapp-field">
                         <label class="webapp-label">Nome App</label>
                         <input type="text" id="webappName" class="webapp-input" placeholder="es. Gmail, YouTube, ChatGPT...">
                     </div>
-                    
                     <div class="webapp-field">
                         <label class="webapp-label">URL</label>
                         <input type="url" id="webappUrl" class="webapp-input" placeholder="https://example.com">
                     </div>
-                    
                     <div class="webapp-field">
                         <label class="webapp-label">Tags (opzionale)</label>
                         <input type="text" id="webappTags" class="webapp-input" placeholder="produttività, social, lavoro...">
                     </div>
                 </div>
-                
                 <div class="webapp-actions">
-                    <button class="webapp-btn primary" onclick="safeLauncher('addWebApp')" id="addWebAppBtn">Aggiungi</button>
-                    <button class="webapp-btn secondary" onclick="safeLauncher('closeWebAppDialog')">Annulla</button>
+                    <button class="webapp-btn primary" onclick="launcher.addWebApp()" id="addWebAppBtn">Aggiungi</button>
+                    <button class="webapp-btn secondary" onclick="launcher.closeWebAppDialog()">Annulla</button>
                 </div>
             </div>
         </div>
 
-        <!-- Settings Dialog -->
         <div class="settings-dialog" id="settingsDialog">
             <div class="settings-content">
                 <div class="settings-header">
                     <div class="settings-title">⚙️ Impostazioni</div>
-                    <button class="settings-close" onclick="safeLauncher('closeSettings')">✖</button>
+                    <button class="settings-close" onclick="launcher.closeSettings()">✖</button>
                 </div>
-                
                 <div class="settings-tabs">
-                    <button class="settings-tab active" onclick="safeLauncher('showSettingsTab', 'appearance')">🎨 Aspetto</button>
-                    <button class="settings-tab" onclick="safeLauncher('showSettingsTab', 'backup')">☁️ Backup</button>
-                    <button class="settings-tab" onclick="safeLauncher('showSettingsTab', 'stats')">📊 Statistiche</button>
+                    <button class="settings-tab active" onclick="launcher.showSettingsTab('appearance')">🎨 Aspetto</button>
+                    <button class="settings-tab" onclick="launcher.showSettingsTab('backup')">☁️ Backup</button>
+                    <button class="settings-tab" onclick="launcher.showSettingsTab('stats')">📊 Statistiche</button>
                 </div>
-                
-                <div class="settings-tab-content" id="settingsTabContent">
-                    <!-- Content will be dynamically generated -->
-                </div>
+                <div class="settings-tab-content" id="settingsTabContent"></div>
             </div>
         </div>
     </div>
-
-    <!-- Debug Info -->
-    <div id="debugInfo" style="position: fixed; bottom: 10px; left: 10px; background: rgba(0,0,0,0.8); color: white; padding: 10px; border-radius: 5px; font-size: 12px; z-index: 9999; display: none;">
-        <div>🔧 SAKAI Debug Info</div>
-        <div id="cssStatus">CSS: Loading...</div>
-        <div id="jsStatus">JS: Loading...</div>
-    </div>
-
-    <script>
-        // Mostra info di debug solo se richiesto
-        if (window.location.hash === '#debug') {
-            document.getElementById('debugInfo').style.display = 'block';
-            
-            // Aggiorna status periodicamente
-            setInterval(() => {
-                const cssStatus = document.querySelector('link[href*="style.css"]') ? '✅ Loaded' : '❌ Missing';
-                const jsStatus = window.launcher ? '✅ Loaded' : '⏳ Loading...';
-                
-                document.getElementById('cssStatus').textContent = `CSS: ${cssStatus}`;
-                document.getElementById('jsStatus').textContent = `JS: ${jsStatus}`;
-            }, 1000);
-        }
-    </script>
+    
+    <script src="./script.js" defer></script>
 </body>
 </html>
