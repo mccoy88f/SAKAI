@@ -1,0 +1,74 @@
+{
+  "name": "sakai",
+  "version": "1.0.0",
+  "description": "SAKAI - Swiss Army Knife by AI - PWA Launcher per applicazioni web client-side",
+  "main": "src/main.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 3000",
+    "build": "vite build",
+    "preview": "vite preview",
+    "serve": "http-server dist -p 8080 -c-1",
+    "lint": "eslint src --ext .js",
+    "lint:fix": "eslint src --ext .js --fix",
+    "format": "prettier --write \"src/**/*.{js,css,html}\"",
+    "test": "vitest",
+    "validate": "npm run lint && npm run test"
+  },
+  "keywords": [
+    "pwa",
+    "launcher",
+    "ai",
+    "web-apps",
+    "client-side",
+    "offline",
+    "sandbox"
+  ],
+  "author": "SAKAI Team",
+  "license": "MIT",
+  "dependencies": {
+    "dexie": "^3.2.4",
+    "jszip": "^3.10.1",
+    "fuse.js": "^7.0.0",
+    "date-fns": "^2.30.0",
+    "lodash-es": "^4.17.21",
+    "dompurify": "^3.0.5"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "vite-plugin-pwa": "^0.17.0",
+    "eslint": "^8.55.0",
+    "prettier": "^3.1.0",
+    "vitest": "^1.0.0",
+    "http-server": "^14.1.1",
+    "@vitejs/plugin-legacy": "^5.2.0"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead",
+    "not ie 11"
+  ],
+  "pwa": {
+    "name": "SAKAI",
+    "short_name": "SAKAI",
+    "description": "Swiss Army Knife by AI - Launcher per app web",
+    "theme_color": "#2563eb",
+    "background_color": "#ffffff",
+    "display": "standalone",
+    "scope": "/",
+    "start_url": "/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sakai/sakai.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sakai/sakai/issues"
+  },
+  "homepage": "https://sakai.dev"
+}
